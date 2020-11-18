@@ -3,9 +3,7 @@ import asyncio
 import random
 from datetime import datetime
 
-import aiohttp
 import discord
-import discord.http
 from discord.ext import commands
 
 from tools import test_username, check_has_gift, secret_string_wrapper
@@ -173,14 +171,9 @@ class CoinDrop(commands.Cog):
         user_nickname, gifts_sent, target_user_nickname = await self._add_score(member.id, when)
         await member.send(f"You successfully sent the gift to {target_user_nickname}! (Total gifts sent: {gifts_sent})")
         rewards = self.bot.config.get('reward_roles', {})
-        # TO-DO: Find a better way to do this
-        http = discord.http.HTTPClient()
-        http._token(self.bot.config.get("token"))
+        await self.bot.get_channel(778410033926897685).send(random.choice(self.bot.config.get("gift_strings")).format(f"**{user_nickname}**", f"**{target_user_nickname}**"))
 
-        session = http._HTTPClient__session = aiohttp.ClientSession()
-        await http.send_message(778410033926897685, content=random.choice(self.bot.config.get("gift_strings")).format(f"**{user_nickname}**", f"**{target_user_nickname}**"))
-
-    # @commands.cooldown(1, 4, commands.BucketType.user)
+            # @commands.cooldown(1, 4, commands.BucketType.user)
     # @commands.cooldown(1, 1.5, commands.BucketType.channel)
     # @commands.command("check")
     # async def check_command(self, ctx: commands.Context):
