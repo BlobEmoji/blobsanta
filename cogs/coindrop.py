@@ -38,10 +38,6 @@ class CoinDrop(commands.Cog):
             async with self.bot.db.acquire() as conn:
                 last_gift = await conn.fetchval("SELECT last_gift FROM user_data WHERE user_id = $1", message.author.id)
 
-                # No spamming for hints
-                if (immediate_time - last_gift).total_seconds() < 15:
-                    return
-
                 gift = await conn.fetchrow(
                     """
                     SELECT nickname
@@ -70,28 +66,18 @@ class CoinDrop(commands.Cog):
         # Ignore messages that are more likely to be spammy
         if len(message.content) < 5:
             return
-
-        recovery = self.bot.config.get("recovery_time", 10)
         drop_chance = self.bot.config.get("drop_chance", 0.1)
         if random.random() < drop_chance:
             async with self.bot.db.acquire() as conn:
                 record = await conn.fetchrow("SELECT last_gift FROM user_data WHERE user_id = $1", message.author.id)
                 if record is not None:
-                    if (datetime.utcnow() - record['last_gift']).total_seconds() > 10:
+                    if (datetime.utcnow() - record['last_gift']).total_seconds() > self.bot.config.get("cooldown_time", 30):
                         self.bot.logger.info(f"A natural gift has dropped ({message.author.id})")
 
                         self.bot.loop.create_task(self.create_gift(message.author, message.created_at))
 
     async def perform_natural_drop(self, user, secret_member, first_attempt):
         async with self.drop_lock:
-            max_additional_delay = self.bot.config.get("additional_delay", 10)
-            cooldown = self.bot.config.get("cooldown_time", 20)
-
-            # round up all emojis and pick one
-            guild_ids = self.bot.config.get("emoji_sources", [272885620769161216])
-            guilds = tuple(filter(None, map(self.bot.get_guild, guild_ids)))
-            emojis = tuple(filter(lambda x: not x.animated, itertools.chain(*[g.emojis for g in guilds])))
-
             async with self.bot.db.acquire() as conn:
 
                 def secret_substring(name):
@@ -112,7 +98,7 @@ class CoinDrop(commands.Cog):
                     result = ''.join(scrambled)
                     return f"Someone scrambled the letters on the label. It reads: `{result}`"
 
-                secret_array = [secret_substring, secret_smudge, secret_scramble]
+                secret_array = [secret_scramble]
                 secret_string = random.choice(secret_array)(secret_member)
                 drop_string = f"{'You found a gift!' if first_attempt else 'You found another label on the side of the gift.'} {secret_string}. Fix the label and send the gift by typing the proper label."
 
