@@ -68,7 +68,7 @@ class CoinDrop(commands.Cog):
             return
 
         # Ignore messages that are more likely to be spammy
-        if message.content.length < 5:
+        if len(message.content) < 5:
             return
 
         recovery = self.bot.config.get("recovery_time", 10)
@@ -265,7 +265,7 @@ class CoinDrop(commands.Cog):
         """Check another user's coin balance"""
         if not self.bot.db_available.is_set():
             return
-        if test_username(nickname, ctx):
+        if await test_username(nickname, ctx):
             return
         async with self.bot.db.acquire() as conn:
 
@@ -393,7 +393,7 @@ class CoinDrop(commands.Cog):
     @commands.check(utils.check_granted_server)
     @commands.command("add_dummy")
     async def add_dummy(self, ctx: commands.Context, nickname: str=''):
-        if test_username(nickname, ctx):
+        if await test_username(nickname, ctx):
             return
         async with self.bot.db.acquire() as conn:
             async with conn.transaction():
