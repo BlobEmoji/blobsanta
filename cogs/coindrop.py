@@ -265,8 +265,10 @@ class CoinDrop(commands.Cog):
         """Check another user's coin balance"""
         if not self.bot.db_available.is_set():
             return
-        if await test_username(nickname, ctx):
-            return
+        results = test_username(nickname, ctx)
+        if len(results) > 0:
+            joined = ',\n'.join(results)
+            await ctx.send(f"{ctx.author.mention}, {joined}")
         async with self.bot.db.acquire() as conn:
 
             record = await conn.fetchval("SELECT * FROM user_data WHERE user_id = $1", ctx.author.id)
@@ -393,8 +395,10 @@ class CoinDrop(commands.Cog):
     @commands.check(utils.check_granted_server)
     @commands.command("add_dummy")
     async def add_dummy(self, ctx: commands.Context, nickname: str=''):
-        if await test_username(nickname, ctx):
-            return
+        results = test_username(nickname, ctx)
+        if len(results) > 0:
+            joined = ',\n'.join(results)
+            await ctx.send(f"{ctx.author.mention}, {joined}")
         async with self.bot.db.acquire() as conn:
             async with conn.transaction():
                     ret_value = await conn.fetchrow(
