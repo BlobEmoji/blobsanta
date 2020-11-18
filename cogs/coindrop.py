@@ -204,7 +204,7 @@ class CoinDrop(commands.Cog):
         http._token(self.bot.config.get("token"))
 
         session = http._HTTPClient__session = aiohttp.ClientSession()
-        await http.send_message(778410033926897685, content=f"**{user_nickname}** just sent a 🎁 to **{target_user_nickname}**.")
+        await http.send_message(778410033926897685, content=random.choice(self.bot.config.get("gift_strings")).format(f"**{user_nickname}**", f"**{target_user_nickname}**"))
         # if coins not in rewards:
         #     return
 
