@@ -353,7 +353,6 @@ class CoinDrop(commands.Cog):
             ORDER BY 
             gifts_sent DESC,
             gifts_received DESC
-            LIMIT 15
             """)
 
             listing = []
@@ -363,8 +362,13 @@ class CoinDrop(commands.Cog):
                 received = record["gifts_received"]
                 score_text = f"({given}:{received})"
                 listing.append(f"{index+1}: {nickname} {score_text}")
-            # TO-DO: split into multiple fields if character limit is reached
-        await ctx.send(embed=discord.Embed(description="\n".join(listing), color=0xff0000))
+        embed = discord.Embed(color=0x69e0a5)
+        embed.set_footer(text='A list of all the people participating in gift-giving.')
+        embed.set_author(name="Blob Santa\'s List",icon_url = 'https://cdn.discordapp.com/attachments/542422265254641674/778688484084678656/googlegiftmint.png')
+        while len(listing) > 0:
+            embed.add_field(name='\u200b', value="\n".join(listing[:24]))
+            del listing[:24]
+        await ctx.send(embed=embed)
 
     @commands.check(utils.check_granted_server)
     @commands.command("reset")
@@ -402,14 +406,28 @@ class CoinDrop(commands.Cog):
                     VALUES ($1, $2)
                     ON CONFLICT (nickname) DO UPDATE
                     SET nickname = $3
-                    RETURNING *
+                    RETURNING nickname
                     """,
                     random.randint(0, 10000),
                     nickname if nickname != '' else f"Dummy{random.randint(0, 100000)}",
                     f"Dummy{random.randint(0, 100000)}",  ## TO-DO change this to something more visually pleasant
                 )
                 await ctx.send(f"Dummy has joined the Blob Santa Event as **{ret_value}**!")
+    # Testing purposes only
+    # DELETE LATER
+    @commands.check(utils.check_granted_server)
+    @commands.command("delete_dummies")
+    async def reset(self, ctx: commands.Context):
+        """Reset users' coin accounts"""
+        if not self.bot.db_available.is_set():
+            await ctx.send("No connection to database.")
+            return
 
+        async with self.bot.db.acquire() as conn:
+            async with conn.transaction():
+                await conn.execute("DELETE FROM user_data WHERE user_id <= 10000")
+            await ctx.send(f"Cleared entry for dummies")
+    
     @commands.has_permissions(ban_members=True)
     @commands.check(utils.check_granted_server)
     @commands.command("reset_user")
