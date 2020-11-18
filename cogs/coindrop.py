@@ -31,13 +31,16 @@ class CoinDrop(commands.Cog):
         self.current_gifters = []
 
     @commands.Cog.listener()
-    async def on_message(self, message):
+    async def on_message(self, message: discord.Message):
 
         immediate_time = datetime.utcnow()
         if message.author.id in self.current_gifters and not message.guild:
             async with self.bot.db.acquire() as conn:
-                record = await conn.fetchrow("SELECT last_gift FROM user_data WHERE user_id = $1", message.author.id)
-                last_gift = record['last_gift']
+                last_gift = await conn.fetchval("SELECT last_gift FROM user_data WHERE user_id = $1", message.author.id)
+
+                # No spamming for hints
+                if (immediate_time - last_gift).total_seconds() < 15:
+                    return
 
                 gift = await conn.fetchrow(
                     """
@@ -62,6 +65,10 @@ class CoinDrop(commands.Cog):
             return
 
         if self.drop_lock.locked():
+            return
+
+        # Ignore messages that are more likely to be spammy
+        if message.content.length < 5:
             return
 
         recovery = self.bot.config.get("recovery_time", 10)
