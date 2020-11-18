@@ -4,7 +4,13 @@ from discord.ext import commands
 def test_username(nickname: str, ctx: commands.Context) -> list:
     errors = []
     string_to_test = ctx.author.display_name if len(nickname) == 0 else nickname
-    verbal_test = "username" if len(nickname) == 0 else "nickname"
+    if len(nickname) == 0:
+        if ctx.author.nick:
+            verbal_test = "nickname"
+        else:
+            verbal_test = "username"
+    else:
+        verbal_test = "custom name"
 
     if len(string_to_test) < 6:
         errors.append(f"Your {verbal_test} is too short. It need to be at least 6 characters.")
