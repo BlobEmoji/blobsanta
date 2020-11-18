@@ -1,5 +1,3 @@
-import re
-
 from discord.ext import commands
 
 
@@ -15,3 +13,15 @@ def test_username(nickname: str, ctx: commands.Context) -> list:
     if not string_to_test.isalpha():
         errors.append(f"Please only use alphabetical characters in your {verbal_test}.")
     return errors
+
+
+async def check_has_gift(db, author_id: int) -> bool:
+    async with db.acquire() as conn:
+        check = await conn.fetchval("""
+        SELECT EXISTS (
+        SELECT 1
+        FROM gifts
+        WHERE active = TRUE and user_id = $1
+        )
+        """, author_id)
+    return check
