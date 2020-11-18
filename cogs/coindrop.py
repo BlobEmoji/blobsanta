@@ -73,7 +73,16 @@ class CoinDrop(commands.Cog):
     async def perform_natural_drop(self, user, secret_member, first_attempt):
         async with self.drop_lock:
             secret_string = secret_string_wrapper(secret_member)
-            drop_string = f"{'You found a gift!' if first_attempt else 'You found another label on the side of the gift.'} {secret_string}. Fix the label and send the gift by typing the proper label."
+            
+            gift_colors = self.bot.config.get('gift_colors')
+
+            new_present = "You found a {0} present with a {1} ribbon!".format(random.choice(gift_colors), random.choice(gift_colors))
+            try_again = random.choice(self.bot.config.get('try_again'))
+
+            drop_string = "{0} {1} Fix the label and send the gift by typing the proper label.".format(
+                new_present if first_attempt else try_again,
+                secret_string
+            )                
 
             await user.send(drop_string)
 
@@ -364,7 +373,7 @@ class CoinDrop(commands.Cog):
                 listing.append(f"{index+1}: {nickname} {score_text}")
         embed = discord.Embed(color=0x69e0a5)
         embed.set_footer(text='A list of all the people participating in gift-giving.')
-        embed.set_author(name="Blob Santa\'s List",icon_url = 'https://cdn.discordapp.com/attachments/542422265254641674/778688484084678656/googlegiftmint.png')
+        embed.set_author(name="Blob Santa\'s List", icon_url = self.bot.config.get("embed_url"))
         while len(listing) > 0:
             embed.add_field(name='\u200b', value="\n".join(listing[:24]))
             del listing[:24]

@@ -27,6 +27,28 @@ emoji_sources = [
   494946907181809667
 ]
 
+gift_colors = [ 
+  'red',
+  'blue',
+  'green',
+  'purple',
+  'yellow',
+  'orange',
+  'mint',
+  'pink',
+  'magenta',
+  'black',
+  'white',
+  'gray',
+  'brown'
+]
+try_again = [
+  "You found another label on the side of the present.",
+  "Let's try again.",
+  "There is another label on the bottom of the present."
+]
+embed_url = 'https://cdn.discordapp.com/attachments/542422265254641674/778729426522341396/googlegiftmintavatar.png'
+
 gift_strings = [
   "🎁 {0} just sent a 🏈 Football to {1}. John Madden is proud of you.",
   "🎁 {0} just sent a 📹️ GIF to {1}. Its expiration date was supposed to be years ago.",
@@ -36,16 +58,16 @@ gift_strings = [
   "🎁 {0} just sent a ⭐ Star to {1}. {1} absorbed the star somehow.",
   "🎁 {0} just sent a 🎱 Magic 8 Ball to {1}. It's good for everything except predictions.",
   "🎁 {0} just sent a 🏁 Checkered Flag to {1}. {1} wins a race thanks to it.",
-  "🎁 {0} just sent a 🏳️ White Glag to {1}, surrendering themselves to {1}.",
+  "🎁 {0} just sent a 🏳️ White Flag to {1}, surrendering themselves to {1}.",
   "🎁 {0} just sent a 🍪 Cookie to {1}. {1} promptly attempts to click on it.",
   "🎁 {0} just sent a 🐱 Cat to {1}. The cat climbs up a furniture, ignoring everyone.",
   "🎁 {0} just sent a 🐶 Dog to {1}. The dog aims for the couch, thrashing it completely.",
   "🎁 {0} just sent a 🎀 Bow to {1}. A perfect accessory for a doll or a pet.",
-  "🎁 {0} just sent a <:bloblamp:580597913600655370> lamp to {1}. Wait a minute, there's not supposed to be a blob there!",
+  "🎁 {0} just sent a <:bloblamp:580597913600655370> Lamp to {1}. Wait a minute, there's not supposed to be a blob there!",
   "🎁 {0} just sent a <:b4nzyblob:396521772905922562> b1nzy blob to {1}. The power of the ban hammer scares {1} away.",
-  "🎁 {0} just sent a 🏎️ toy car to {1}. The toy car managed to give hours of entertainment successfully.",
-  "🎁 {0} just sent a 🏆 trophy to {1}. This is when you celebrate your moment of victory, if you had one!"
-  ]
+  "🎁 {0} just sent a 🏎️ Toy car to {1}. The toy car managed to give hours of entertainment successfully.",
+  "🎁 {0} just sent a 🏆 Trophy to {1}. This is when you celebrate your moment of victory, if you had one!"
+]
 
 [reward_roles]
 # Roles given to users once they reach a certain coin threshold
