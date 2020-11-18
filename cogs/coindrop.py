@@ -288,6 +288,7 @@ class CoinDrop(commands.Cog):
                             WHERE active = TRUE AND user_id = $1
                             """, ctx.author.id)
 
+<<<<<<< HEAD
                 await ctx.send(f"Deleted, the answer was {gift.lower()}")
         else:
             async with self.bot.db.acquire() as conn:
@@ -296,6 +297,9 @@ class CoinDrop(commands.Cog):
                     await ctx.send("You can only give up on gifts in DMs")
                 else:
                     await ctx.send("You don't have anything to give up on")
+=======
+                await ctx.send(f"Deleted, the answer was **{gift}**.")
+>>>>>>> Improve answer readability
 
     @commands.check(utils.check_granted_server)
     @commands.command("join")
