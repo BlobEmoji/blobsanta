@@ -12,6 +12,7 @@ import discord.http
 import discord
 from discord.ext import commands
 
+from tools import test_username
 from . import utils
 
 
@@ -33,7 +34,7 @@ class CoinDrop(commands.Cog):
     async def on_message(self, message):
 
         immediate_time = datetime.utcnow()
-        if message.author.id in self.current_gifters and not message.guild: 
+        if message.author.id in self.current_gifters and not message.guild:
             async with self.bot.db.acquire() as conn:
                 record = await conn.fetchrow("SELECT last_gift FROM user_data WHERE user_id = $1", message.author.id)
                 last_gift = record['last_gift']
@@ -71,7 +72,7 @@ class CoinDrop(commands.Cog):
                 if record is not None:
                     if (datetime.utcnow() - record['last_gift']).total_seconds() > 10:
                         self.bot.logger.info(f"A natural gift has dropped ({message.author.id})")
-                                
+
                         self.bot.loop.create_task(self.create_gift(message.author, message.created_at))
 
     async def perform_natural_drop(self, user, secret_member, first_attempt):
@@ -83,9 +84,9 @@ class CoinDrop(commands.Cog):
             guild_ids = self.bot.config.get("emoji_sources", [272885620769161216])
             guilds = tuple(filter(None, map(self.bot.get_guild, guild_ids)))
             emojis = tuple(filter(lambda x: not x.animated, itertools.chain(*[g.emojis for g in guilds])))
-            
+
             async with self.bot.db.acquire() as conn:
-                
+
                 def secret_substring(name):
                     length = random.randint(3,4)
                     start = random.randint(0,len(name)-length)
@@ -103,16 +104,16 @@ class CoinDrop(commands.Cog):
                     random.shuffle(scrambled)
                     result = ''.join(scrambled)
                     return f"Someone scrambled the letters on the label. It reads: `{result}`"
-                
+
                 secret_array = [secret_substring, secret_smudge, secret_scramble]
                 secret_string = random.choice(secret_array)(secret_member)
                 drop_string = f"{'You found a gift!' if first_attempt else 'You found another label on the side of the gift.'} {secret_string}. Fix the label and send the gift by typing the proper label."
-                
+
                 drop_message = await user.send(drop_string)
-    
+
     async def create_gift(self, member, when):
         async with self.bot.db.acquire() as conn:
-        
+
             secret_member_obj = {}
             first_attempt = True
 
@@ -139,11 +140,11 @@ class CoinDrop(commands.Cog):
                     self.bot.logger.error(f"I wanted to drop a gift, but I couldn't find any members to send to!")
                     return
                 secret_member_obj = random.choice(secret_members)
-                
+
             secret_member = secret_member_obj['nickname']
             target_user_id = secret_member_obj['user_id']
-            
-            
+
+
             async with conn.transaction():
                 await conn.fetch(
                     """
@@ -164,7 +165,7 @@ class CoinDrop(commands.Cog):
                         target_user_id
                     )
         await self.perform_natural_drop(member, secret_member, first_attempt)
-         
+
 
     async def _add_score(self, user_id, when):
         await self.bot.db_available.wait()
@@ -208,7 +209,7 @@ class CoinDrop(commands.Cog):
         # TO-DO: Find a better way to do this
         http = discord.http.HTTPClient()
         http._token(self.bot.config.get("token"))
-        
+
         session = http._HTTPClient__session = aiohttp.ClientSession()
         await http.send_message(778410033926897685, content=f"**{user_nickname}** just sent a 🎁 to **{target_user_nickname}**.")
         # if coins not in rewards:
@@ -257,14 +258,7 @@ class CoinDrop(commands.Cog):
         """Check another user's coin balance"""
         if not self.bot.db_available.is_set():
             return
-        if not re.match('^[a-zA-Z0-9_]+$', nickname) and nickname != '': 
-            await ctx.send(f"{ctx.author.mention} Please only use alphanumeric characters in your nickname.")
-            return
-        elif not re.match('^[a-zA-Z0-9_]+$', ctx.author.display_name) and nickname == '':
-            await ctx.send(f"{ctx.author.mention} Your username is invalid. Please choose a nickname with `.join <nickname>`.")
-            return
-        if len(nickname) > 32:
-            await ctx.send(f"{ctx.author.mention} Your username is too long. It needs to be under 32 characters.")
+        if test_username(nickname, ctx):
             return
         async with self.bot.db.acquire() as conn:
 
@@ -280,7 +274,7 @@ class CoinDrop(commands.Cog):
                         SET nickname = $3
                         RETURNING *
                         """,
-                        
+
                         ctx.author.id,
                         nickname if nickname != '' else ctx.author.display_name,
                         str(ctx.author.id), ## TO-DO change this to something more visually pleasant
@@ -358,7 +352,7 @@ class CoinDrop(commands.Cog):
             gifts_sent DESC,
             gifts_received DESC
             """)
-            
+
             listing = []
             for index, record in enumerate(records):
                 nickname = record["nickname"]
@@ -392,6 +386,8 @@ class CoinDrop(commands.Cog):
     @commands.check(utils.check_granted_server)
     @commands.command("add_dummy")
     async def add_dummy(self, ctx: commands.Context, nickname: str=''):
+        if test_username(nickname, ctx):
+            return
         async with self.bot.db.acquire() as conn:
             async with conn.transaction():
                     ret_value = await conn.fetchrow(
