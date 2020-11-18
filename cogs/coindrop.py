@@ -98,7 +98,7 @@ class CoinDrop(commands.Cog):
                     result = ''.join(scrambled)
                     return f"Someone scrambled the letters on the label. It reads: `{result}`"
 
-                secret_array = [secret_scramble]
+                secret_array = [secret_scramble, secret_substring, secret_smudge]
                 secret_string = random.choice(secret_array)(secret_member)
                 drop_string = f"{'You found a gift!' if first_attempt else 'You found another label on the side of the gift.'} {secret_string}. Fix the label and send the gift by typing the proper label."
 
