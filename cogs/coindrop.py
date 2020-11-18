@@ -1,18 +1,14 @@
 # -*- coding: utf-8 -*-
-import re
 import asyncio
-import itertools
 import random
-from datetime import datetime, timedelta
-from io import BytesIO
+from datetime import datetime
 
-from PIL import Image, ImageFilter
 import aiohttp
-import discord.http
 import discord
+import discord.http
 from discord.ext import commands
 
-from tools import test_username, check_has_gift
+from tools import test_username, check_has_gift, secret_string_wrapper
 from . import utils
 
 
@@ -78,31 +74,10 @@ class CoinDrop(commands.Cog):
 
     async def perform_natural_drop(self, user, secret_member, first_attempt):
         async with self.drop_lock:
-            async with self.bot.db.acquire() as conn:
+            secret_string = secret_string_wrapper(secret_member)
+            drop_string = f"{'You found a gift!' if first_attempt else 'You found another label on the side of the gift.'} {secret_string}. Fix the label and send the gift by typing the proper label."
 
-                def secret_substring(name):
-                    length = random.randint(3,4)
-                    start = random.randint(0,len(name)-length)
-                    result = name[start:start+length]
-                    return f"Part of the label has been cut off! The remaining label contains: `{result}`"
-                def secret_smudge(name):
-                    smudged = random.sample(range(len(name)), round(len(name)*.7))
-                    result  = list(name)
-                    for i in smudged:
-                        result[i] = '#'
-                    result = ''.join(result)
-                    return f"The label has smudges on it. You can only make out the following letters: `{result}`"
-                def secret_scramble(name):
-                    scrambled = list(name)
-                    random.shuffle(scrambled)
-                    result = ''.join(scrambled)
-                    return f"Someone scrambled the letters on the label. It reads: `{result}`"
-
-                secret_array = [secret_scramble, secret_substring, secret_smudge]
-                secret_string = random.choice(secret_array)(secret_member)
-                drop_string = f"{'You found a gift!' if first_attempt else 'You found another label on the side of the gift.'} {secret_string}. Fix the label and send the gift by typing the proper label."
-
-                drop_message = await user.send(drop_string)
+            await user.send(drop_string)
 
     async def create_gift(self, member, when):
         async with self.bot.db.acquire() as conn:
@@ -159,7 +134,6 @@ class CoinDrop(commands.Cog):
                     )
         await self.perform_natural_drop(member, secret_member, first_attempt)
 
-
     async def _add_score(self, user_id, when):
         await self.bot.db_available.wait()
 
@@ -205,19 +179,6 @@ class CoinDrop(commands.Cog):
 
         session = http._HTTPClient__session = aiohttp.ClientSession()
         await http.send_message(778410033926897685, content=random.choice(self.bot.config.get("gift_strings")).format(f"**{user_nickname}**", f"**{target_user_nickname}**"))
-        # if coins not in rewards:
-        #     return
-
-        # role = member.guild.get_role(rewards[coins])
-
-        # if role is None:
-        #     self.bot.logger.warning(f'Failed to find reward role for {coins} coins.')
-        #     return
-
-        # try:
-        #     await member.add_roles(role, reason=f'Reached {coins} coins reward.')
-        # except discord.HTTPException:
-        #     self.bot.logger.exception(f'Failed to add reward role for {coins} coins to {member!r}.')
 
     # @commands.cooldown(1, 4, commands.BucketType.user)
     # @commands.cooldown(1, 1.5, commands.BucketType.channel)
@@ -246,7 +207,7 @@ class CoinDrop(commands.Cog):
     #             pass
 
     @commands.command("give_up")
-    async def giv_up_command(self, ctx: commands.Context):
+    async def give_up_command(self, ctx: commands.Context):
         message: discord.Message = ctx.message
         if isinstance(message.channel, discord.DMChannel):
             check = await check_has_gift(self.bot.db, ctx.author.id)
@@ -399,6 +360,7 @@ class CoinDrop(commands.Cog):
             ORDER BY 
             gifts_sent DESC,
             gifts_received DESC
+            LIMIT 15
             """)
 
             listing = []
@@ -441,19 +403,20 @@ class CoinDrop(commands.Cog):
             return
         async with self.bot.db.acquire() as conn:
             async with conn.transaction():
-                    ret_value = await conn.fetchrow(
-                        """
-                        INSERT INTO user_data (user_id, nickname)
-                        VALUES ($1, $2)
-                        ON CONFLICT (nickname) DO UPDATE
-                        SET nickname = $3
-                        RETURNING *
-                        """,
-                        random.randint(0,10000),
-                        nickname if nickname != '' else f"Dummy{random.randint(0,100000)}",
-                        f"Dummy{random.randint(0,100000)}", ## TO-DO change this to something more visually pleasant
-                        )
-                    await ctx.send(f"Dummy has joined the Blob Santa Event as **{ret_value['nickname']}**!")
+                ret_value = await conn.fetchval(
+                    """
+                    INSERT INTO user_data (user_id, nickname)
+                    VALUES ($1, $2)
+                    ON CONFLICT (nickname) DO UPDATE
+                    SET nickname = $3
+                    RETURNING *
+                    """,
+                    random.randint(0, 10000),
+                    nickname if nickname != '' else f"Dummy{random.randint(0, 100000)}",
+                    f"Dummy{random.randint(0, 100000)}",  ## TO-DO change this to something more visually pleasant
+                )
+                await ctx.send(f"Dummy has joined the Blob Santa Event as **{ret_value}**!")
+
     @commands.has_permissions(ban_members=True)
     @commands.check(utils.check_granted_server)
     @commands.command("reset_user")
@@ -491,25 +454,6 @@ class CoinDrop(commands.Cog):
                     await conn.execute("DELETE FROM user_data WHERE user_id = $1", user.id)
 
                 await ctx.send(f"Cleared entry for {user.id}")
-
-    # @commands.has_permissions(ban_members=True)
-    # @commands.check(utils.check_granted_server)
-    # @commands.command("drop_setting")
-    # async def drop_setting(self, ctx: commands.Context, setting: bool=None):
-    #     """Set whether coins will drop at random or not."""
-    #     if setting is None:
-    #         await ctx.send(f"Currently{' NOT' if self.no_drops else ''} doing random drops.")
-    #         return
-
-    #     self.no_drops = not setting
-    #     await ctx.send(f"Will{'' if setting else ' **NOT**'} do random drops.")
-
-    # @staticmethod
-    # async def attempt_add_reaction(message: discord.Message, reaction):
-    #     try:
-    #         await message.add_reaction(reaction)
-    #     except discord.HTTPException:
-    #         pass
 
     # @commands.has_permissions(ban_members=True)
     # @commands.check(utils.check_granted_server)
