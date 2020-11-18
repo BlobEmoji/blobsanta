@@ -12,7 +12,7 @@ import discord.http
 import discord
 from discord.ext import commands
 
-from tools import test_username
+from tools import test_username, check_has_gift
 from . import utils
 
 
@@ -249,6 +249,12 @@ class CoinDrop(commands.Cog):
     async def giv_up_command(self, ctx: commands.Context):
         message: discord.Message = ctx.message
         if isinstance(message.channel, discord.DMChannel):
+            check = await check_has_gift(self.bot.db, ctx.author.id)
+
+            if not check:
+                await ctx.send("You don't have anything to give up on")
+                return
+
             confirm_text = f"confirm {random.randint(0, 999999):06}"
             await ctx.send(f"Are you sure you want to give up?. Type '{confirm_text}' or 'cancel'")
 
@@ -283,6 +289,13 @@ class CoinDrop(commands.Cog):
                             """, ctx.author.id)
 
                 await ctx.send(f"Deleted, the answer was {gift.lower()}")
+        else:
+            async with self.bot.db.acquire() as conn:
+                check = await check_has_gift(self.bot.db, ctx.author.id)
+                if check:
+                    await ctx.send("You can only give up on gifts in DMs")
+                else:
+                    await ctx.send("You don't have anything to give up on")
 
     @commands.check(utils.check_granted_server)
     @commands.command("join")
