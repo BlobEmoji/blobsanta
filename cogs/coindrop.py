@@ -440,14 +440,14 @@ class CoinDrop(commands.Cog):
     @commands.has_permissions(ban_members=True)
     @commands.check(utils.check_granted_server)
     @commands.command("reset_user")
-    async def reset_user(self, ctx: commands.Context, user: discord.User):
+    async def reset_user(self, ctx: commands.Context, user_id: str=''):
         """Reset users' coin accounts"""
         if not self.bot.db_available.is_set():
             await ctx.send("No connection to database.")
             return
-
+        user_id = int(user_id)
         async with self.bot.db.acquire() as conn:
-            record = await conn.fetchrow("SELECT * FROM user_data WHERE user_id = $1", user.id)
+            record = await conn.fetchrow("SELECT * FROM user_data WHERE user_id = $1", user_id)
             if record is None:
                 await ctx.send("This user doesn't have a database entry.")
                 return
@@ -463,7 +463,7 @@ class CoinDrop(commands.Cog):
             try:
                 validate_message = await self.bot.wait_for('message', check=wait_check, timeout=30)
             except asyncio.TimeoutError:
-                await ctx.send(f"Timed out request to reset {user.id}.")
+                await ctx.send(f"Timed out request to reset {user_id}.")
                 return
             else:
                 if validate_message.content.lower() == 'cancel':
@@ -471,9 +471,9 @@ class CoinDrop(commands.Cog):
                     return
 
                 async with conn.transaction():
-                    await conn.execute("DELETE FROM user_data WHERE user_id = $1", user.id)
+                    await conn.execute("DELETE FROM user_data WHERE user_id = $1", user_id)
 
-                await ctx.send(f"Cleared entry for {user.id}")
+                await ctx.send(f"Cleared entry for {user_id}")
 
     # @commands.has_permissions(ban_members=True)
     # @commands.check(utils.check_granted_server)
