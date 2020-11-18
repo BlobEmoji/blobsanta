@@ -245,6 +245,45 @@ class CoinDrop(commands.Cog):
     #         except (discord.Forbidden, discord.HTTPException):
     #             pass
 
+    @commands.command("give_up")
+    async def giv_up_command(self, ctx: commands.Context):
+        message: discord.Message = ctx.message
+        if isinstance(message.channel, discord.DMChannel):
+            confirm_text = f"confirm {random.randint(0, 999999):06}"
+            await ctx.send(f"Are you sure you want to give up?. Type '{confirm_text}' or 'cancel'")
+
+            def wait_check(msg):
+                return msg.author.id == ctx.author.id and msg.content.lower() in (confirm_text, "cancel")
+
+            try:
+                validate_message = await self.bot.wait_for('message', check=wait_check, timeout=30)
+            except asyncio.TimeoutError:
+                await ctx.send(f"Timed out request to reset {ctx.author.id}.")
+                return
+            else:
+                if validate_message.content.lower() == 'cancel':
+                    await ctx.send("Cancelled.")
+                    return
+
+                async with self.bot.db.acquire() as conn:
+                    gift = await conn.fetchval(
+                        """
+                        SELECT nickname
+                        FROM gifts 
+                        INNER JOIN user_data
+                        ON target_user_id = user_data.user_id
+                        WHERE gifts.user_id = $1 AND active 
+                        """, message.author.id)
+
+                    async with conn.transaction():
+                        await conn.execute(
+                            """
+                            DELETE FROM gifts
+                            WHERE active = TRUE AND user_id = $1
+                            """, ctx.author.id)
+
+                await ctx.send(f"Deleted, the answer was {gift.lower()}")
+
     @commands.check(utils.check_granted_server)
     @commands.command("join")
     async def join_command(self, ctx: commands.Context, *, nickname: str=''):
