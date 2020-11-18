@@ -1,0 +1,20 @@
+version: '2'
+
+volumes:
+  blobsanta-postgresql:
+    external: true
+
+services:
+
+  bot:
+    build: .
+    depends_on:
+      - db
+    volumes:
+      - ./:/app
+
+  db:
+    image: postgres:10-alpine
+    volumes:
+      - blobsanta-postgresql:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
