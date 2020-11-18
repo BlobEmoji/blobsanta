@@ -307,6 +307,7 @@ class CoinDrop(commands.Cog):
         if len(results) > 0:
             joined = ',\n'.join(results)
             await ctx.send(f"{ctx.author.mention}, {joined}")
+            return
         async with self.bot.db.acquire() as conn:
 
             record = await conn.fetchval("SELECT * FROM user_data WHERE user_id = $1", ctx.author.id)
@@ -437,6 +438,7 @@ class CoinDrop(commands.Cog):
         if len(results) > 0:
             joined = ',\n'.join(results)
             await ctx.send(f"{ctx.author.mention}, {joined}")
+            return
         async with self.bot.db.acquire() as conn:
             async with conn.transaction():
                     ret_value = await conn.fetchrow(
