@@ -169,21 +169,35 @@ class CoinDrop(commands.Cog):
                     UPDATE user_data 
                     SET last_gift = $2, gifts_sent = gifts_sent + 1
                     WHERE user_id = $1 
-                    RETURNING gifts_sent, nickname
+                    RETURNING gifts_sent, gifts_received, nickname
                     """,
                     user_id,
                     when
                 )
-                return current_user['nickname'], current_user['gifts_sent'], target_user_nickname['nickname']
+                return current_user['nickname'], current_user['gifts_sent'], current_user['gifts_received'], target_user_nickname['nickname']
 
     async def add_score(self, member, when):
-        user_nickname, gifts_sent, target_user_nickname = await self._add_score(member.id, when)
+        user_nickname, gifts_sent, gifts_received, target_user_nickname = await self._add_score(member.id, when)
         await member.send(f"You successfully sent the gift to {target_user_nickname}! (Total gifts sent: {gifts_sent})")
         rewards = self.bot.config.get('reward_roles', {})
         await self.bot.get_channel(778410033926897685).send(random.choice(self.bot.config.get("gift_strings")).format(f"**{user_nickname}**", f"**{target_user_nickname}**"))
+        
+        # TO-DO: Find a way to count gifts recieved in the reward role
+        rewards = self.bot.config.get('reward_roles', {})
+        if gifts_sent not in rewards:
+            return
 
-            # @commands.cooldown(1, 4, commands.BucketType.user)
+        role = member.guild.get_role(rewards[gifts_sent])
 
+        if role is None:
+            self.bot.logger.warning(f'Failed to find reward role for {gifts_sent} gifts sent.')
+            return
+
+        try:
+            await member.add_roles(role, reason=f'Reached {gifts_sent} gifts sent reward.')
+        except discord.HTTPException:
+            self.bot.logger.exception(f'Failed to add reward role for {gifts_sent} gifts sent to {member!r}.')
+    @commands.cooldown(1, 4, commands.BucketType.user)
     @commands.cooldown(1, 1.5, commands.BucketType.channel)
     @commands.command("check")
     async def check_command(self, ctx: commands.Context):
