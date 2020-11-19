@@ -183,30 +183,25 @@ class CoinDrop(commands.Cog):
         await self.bot.get_channel(778410033926897685).send(random.choice(self.bot.config.get("gift_strings")).format(f"**{user_nickname}**", f"**{target_user_nickname}**"))
 
             # @commands.cooldown(1, 4, commands.BucketType.user)
-    # @commands.cooldown(1, 1.5, commands.BucketType.channel)
-    # @commands.command("check")
-    # async def check_command(self, ctx: commands.Context):
-    #     """Check your coin balance"""
-    #     if not self.bot.db_available.is_set():
-    #         return
 
-    #     currency_name = self.bot.config.get("currency", {})
-    #     singular_coin = currency_name.get("singular", "coin")
-    #     plural_coin = currency_name.get("plural", "coins")
+    @commands.cooldown(1, 1.5, commands.BucketType.channel)
+    @commands.command("check")
+    async def check_command(self, ctx: commands.Context):
+        """Check your coin balance"""
+        if not self.bot.db_available.is_set():
+            return
 
-    #     async with self.bot.db.acquire() as conn:
-    #         record = await conn.fetchrow("SELECT coins FROM user_data WHERE user_id = $1", ctx.author.id)
+        async with self.bot.db.acquire() as conn:
+            record = await conn.fetchrow("SELECT gifts_sent, gifts_received, nickname FROM user_data WHERE user_id = $1", ctx.author.id)
 
-    #         try:
-    #             if record is None:
-    #                 await ctx.author.send(f"You haven't got any {plural_coin} yet!")
-    #             else:
-    #                 coins = record["coins"]
-    #                 coin_text = f"{coins} {singular_coin if coins==1 else plural_coin}"
-    #                 await ctx.author.send(f"You have {coin_text}.")
-    #             await ctx.message.delete()
-    #         except (discord.Forbidden, discord.HTTPException):
-    #             pass
+            try:
+                if record is None:
+                    await ctx.author.send(f"You haven't sent any gifts yet! Use `.join` in a channel to join the fun!")
+                else:
+                    await ctx.author.send(f"You ({record['nickname']}) have sent {record['gifts_sent']} and received {record['gifts_received']} 🎁 **Gifts**.")
+                await ctx.message.delete()
+            except (discord.Forbidden, discord.HTTPException):
+                pass
 
     @commands.command("give_up")
     async def give_up_command(self, ctx: commands.Context):
@@ -294,59 +289,55 @@ class CoinDrop(commands.Cog):
             else:
                 await ctx.send(f"{ctx.author.mention} You have already joined the event. You can ask a staff member to change your nickname.")
 
-    # @commands.has_permissions(ban_members=True)
-    # @commands.check(utils.check_granted_server)
-    # @commands.command("peek")
-    # async def peek_command(self, ctx: commands.Context, *, target: discord.Member):
-    #     """Check another user's coin balance"""
-    #     if not self.bot.db_available.is_set():
-    #         return
+    @commands.has_permissions(ban_members=True)
+    @commands.check(utils.check_granted_server)
+    @commands.command("peek")
+    async def peek_command(self, ctx: commands.Context, *, target: discord.Member):
+        """Check another user's coin balance"""
+        if not self.bot.db_available.is_set():
+            return
 
-    #     currency_name = self.bot.config.get("currency", {})
-    #     singular_coin = currency_name.get("singular", "coin")
-    #     plural_coin = currency_name.get("plural", "coins")
+        currency_name = self.bot.config.get("currency", {})
+        singular_coin = currency_name.get("singular", "coin")
+        plural_coin = currency_name.get("plural", "coins")
 
-    #     async with self.bot.db.acquire() as conn:
-    #         record = await conn.fetchrow("SELECT coins FROM user_data WHERE user_id = $1", target.id)
+        async with self.bot.db.acquire() as conn:
+            record = await conn.fetchrow("SELECT gifts_sent, gifts_received, nickname FROM user_data WHERE user_id = $1", target.id)
 
-    #         if record is None:
-    #             await ctx.send(f"{target.mention} hasn't gotten any {plural_coin} yet!")
-    #         else:
-    #             coins = record["coins"]
-    #             coin_text = f"{coins} {singular_coin if coins==1 else plural_coin}"
-    #             await ctx.send(f"{target.mention} has {coin_text}.")
+            if record is None:
+                await ctx.send(f"{target.mention} hasn't gotten any {plural_coin} yet!")
+            else:
+                coins = record["coins"]
+                coin_text = f"{coins} {singular_coin if coins==1 else plural_coin}"
+                await ctx.send(f"{target.mention} {record['nickname']} has sent {record['gifts_sent']} and received {record['gifts_received']} gifts.")
 
-    # @commands.cooldown(1, 4, commands.BucketType.user)
-    # @commands.cooldown(1, 1.5, commands.BucketType.channel)
-    # @commands.command("stats")
-    # async def stats_command(self, ctx: commands.Context, *, mode: str=''):
-    #     """Coin leaderboard"""
-    #     if not self.bot.db_available.is_set():
-    #         return
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    @commands.cooldown(1, 1.5, commands.BucketType.channel)
+    @commands.command("stats")
+    async def stats_command(self, ctx: commands.Context, *, mode: str=''):
+        """Gift leaderboard"""
+        if not self.bot.db_available.is_set():
+            return
 
-    #     currency_name = self.bot.config.get("currency", {})
-    #     singular_coin = currency_name.get("singular", "coin")
-    #     plural_coin = currency_name.get("plural", "coins")
+        limit = 8
 
-    #     limit = 8
+        if mode == 'long' and (not ctx.guild or ctx.author.guild_permissions.ban_members):
+            limit = 25
 
-    #     if mode == 'long' and (not ctx.guild or ctx.author.guild_permissions.ban_members):
-    #         limit = 25
+        async with self.bot.db.acquire() as conn:
+            records = await conn.fetch("""
+            SELECT * FROM user_data
+            ORDER BY gifts_sent DESC
+            LIMIT $1
+            """, limit)
 
-    #     async with self.bot.db.acquire() as conn:
-    #         records = await conn.fetch("""
-    #         SELECT * FROM user_data
-    #         ORDER BY coins DESC
-    #         LIMIT $1
-    #         """, limit)
+            listing = []
+            for index, record in enumerate(records):
+                gifts = record["gifts_sent"]
+                gift_text = f"{gifts} gift{'' if gifts==1 else 's'} sent"
+                listing.append(f"{index+1}: <@{record['user_id']}> with {gift_text} as {record['nickname']}")
 
-    #         listing = []
-    #         for index, record in enumerate(records):
-    #             coins = record["coins"]
-    #             coin_text = f"{coins} {singular_coin if coins==1 else plural_coin}"
-    #             listing.append(f"{index+1}: <@{record['user_id']}> with {coin_text}")
-
-    #     await ctx.send(embed=discord.Embed(description="\n".join(listing), color=0xff0000))
+        await ctx.send(embed=discord.Embed(description="\n".join(listing), color=0xff0000))
 
     @commands.cooldown(1, 4, commands.BucketType.user)
     @commands.cooldown(1, 1.5, commands.BucketType.channel)
@@ -360,8 +351,7 @@ class CoinDrop(commands.Cog):
             records = await conn.fetch("""
             SELECT nickname, gifts_sent, gifts_received FROM user_data
             ORDER BY 
-            gifts_sent DESC,
-            gifts_received DESC
+            nickname ASC
             """)
 
             listing = []
@@ -370,7 +360,7 @@ class CoinDrop(commands.Cog):
                 given = record["gifts_sent"]
                 received = record["gifts_received"]
                 score_text = f"({given}:{received})"
-                listing.append(f"{index+1}: {nickname} {score_text}")
+                listing.append(f"{nickname} {score_text}")
         embed = discord.Embed(color=0x69e0a5)
         embed.set_footer(text='A list of all the people participating in gift-giving.')
         embed.set_author(name="Blob Santa\'s List", icon_url = self.bot.config.get("embed_url"))
@@ -474,34 +464,6 @@ class CoinDrop(commands.Cog):
                     await conn.execute("DELETE FROM user_data WHERE user_id = $1", user_id)
 
                 await ctx.send(f"Cleared entry for {user_id}")
-
-    # @commands.has_permissions(ban_members=True)
-    # @commands.check(utils.check_granted_server)
-    # @commands.command("force_spawn")
-    # async def force_spawn_command(self, ctx: commands.Context, where: discord.TextChannel = None):
-    #     """Force spawns a coin in a given channel."""
-    #     if where is None:
-    #         await ctx.send("You must specify a drop channel.")
-    #         return
-
-    #     if not self.bot.db_available.is_set():
-    #         await ctx.send("Cannot access the db right now.")
-    #         return
-
-    #     if self.drop_lock.locked():
-    #         await ctx.send("A coin is already spawned somewhere.")
-    #         return
-
-    #     if where.id not in self.bot.config.get("drop_channels", []):
-    #         await ctx.send("Channel is not in drop list.")
-    #         return
-
-    #     coin_id = '%016x' % random.randrange(16 ** 16)
-    #     self.bot.logger.info(f"A random coin was force dropped by {ctx.author.id} ({coin_id})")
-    #     self.last_coin_id = coin_id
-    #     self.bot.loop.create_task(self.attempt_add_reaction(ctx.message, "\N{WHITE HEAVY CHECK MARK}"))
-    #     await self.perform_natural_drop(where, coin_id)
-
 
 def setup(bot):
     bot.add_cog(CoinDrop(bot))
