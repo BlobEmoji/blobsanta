@@ -5,9 +5,9 @@ drop_channels = [
   778414238061428766
 ]
 present_log = 778410033926897685
-cooldown_time = 20  # seconds for cooldown
+cooldown_time = 30  # seconds for cooldown
 
-drop_chance = 1  # chance for drop per message as float (0.1 is 10%, etc)
+drop_chance = 0.1  # chance for drop per message as float (0.1 is 10%, etc)
 
 
 admin_users = [
