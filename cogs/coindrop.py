@@ -187,7 +187,7 @@ class CoinDrop(commands.Cog):
     @commands.cooldown(1, 1.5, commands.BucketType.channel)
     @commands.command("check")
     async def check_command(self, ctx: commands.Context):
-        """Check your coin balance"""
+        """Check your gifts sent and received"""
         if not self.bot.db_available.is_set():
             return
 
@@ -203,8 +203,9 @@ class CoinDrop(commands.Cog):
             except (discord.Forbidden, discord.HTTPException):
                 pass
 
-    @commands.command("give_up")
-    async def give_up_command(self, ctx: commands.Context):
+    @commands.command("giveup")
+    async def giveup_command(self, ctx: commands.Context):
+        """Give up on a label"""
         message: discord.Message = ctx.message
         if isinstance(message.channel, discord.DMChannel):
             check = await check_has_gift(self.bot.db, ctx.author.id)
@@ -258,7 +259,7 @@ class CoinDrop(commands.Cog):
     @commands.check(utils.check_granted_server)
     @commands.command("join")
     async def join_command(self, ctx: commands.Context, *, nickname: str=''):
-        """Check another user's coin balance"""
+        """Join the event"""
         if not self.bot.db_available.is_set():
             return
         results = test_username(nickname, ctx)
@@ -293,7 +294,7 @@ class CoinDrop(commands.Cog):
     @commands.check(utils.check_granted_server)
     @commands.command("peek")
     async def peek_command(self, ctx: commands.Context, *, target: discord.Member):
-        """Check another user's coin balance"""
+        """Check another user's gifts"""
         if not self.bot.db_available.is_set():
             return
 
@@ -343,7 +344,7 @@ class CoinDrop(commands.Cog):
     @commands.cooldown(1, 1.5, commands.BucketType.channel)
     @commands.command("list")
     async def list_command(self, ctx: commands.Context):
-        """Coin leaderboard"""
+        """List of all participating gifters"""
         if not self.bot.db_available.is_set():
             return
 
@@ -372,11 +373,11 @@ class CoinDrop(commands.Cog):
             await ctx.message.delete()
         except (discord.Forbidden, discord.HTTPException):
             pass
-        
+    # Testing purposes only
+    # DELETE LATER
     @commands.check(utils.check_granted_server)
     @commands.command("reset")
-    async def reset(self, ctx: commands.Context):
-        """Reset users' coin accounts"""
+    async def reset_command(self, ctx: commands.Context):
         if not self.bot.db_available.is_set():
             await ctx.send("No connection to database.")
             return
@@ -421,7 +422,6 @@ class CoinDrop(commands.Cog):
     @commands.check(utils.check_granted_server)
     @commands.command("delete_dummies")
     async def reset(self, ctx: commands.Context):
-        """Reset users' coin accounts"""
         if not self.bot.db_available.is_set():
             await ctx.send("No connection to database.")
             return
