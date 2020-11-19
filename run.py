@@ -39,5 +39,5 @@ token = config["token"]
 bot = DropBot('.', config=config)
 
 bot.load_extension("jishaku")
-bot.load_extension("cogs.coindrop")
+bot.load_extension("cogs.giftdrop")
 bot.run(token)

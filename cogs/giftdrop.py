@@ -14,7 +14,7 @@ class Rollback(Exception):
     pass
 
 
-class CoinDrop(commands.Cog):
+class GiftDrop(commands.Cog):
     def __init__(self, bot):
         super().__init__()
         self.http = None
@@ -49,7 +49,7 @@ class CoinDrop(commands.Cog):
 
 
         if message.content.startswith("."):
-            return  # do not drop coins on commands
+            return  # do not drop gifts on commands
 
         if message.channel.id not in self.bot.config.get("drop_channels", []):
             return
@@ -325,18 +325,12 @@ class CoinDrop(commands.Cog):
         if not self.bot.db_available.is_set():
             return
 
-        currency_name = self.bot.config.get("currency", {})
-        singular_coin = currency_name.get("singular", "coin")
-        plural_coin = currency_name.get("plural", "coins")
-
         async with self.bot.db.acquire() as conn:
             record = await conn.fetchrow("SELECT gifts_sent, gifts_received, nickname FROM user_data WHERE user_id = $1", target.id)
 
             if record is None:
-                await ctx.send(f"{target.mention} hasn't gotten any {plural_coin} yet!")
+                await ctx.send(f"{target.mention} hasn't gotten any gifts yet!")
             else:
-                coins = record["coins"]
-                coin_text = f"{coins} {singular_coin if coins==1 else plural_coin}"
                 await ctx.send(f"{target.mention} {record['nickname']} has sent {record['gifts_sent']} and received {record['gifts_received']} gifts.")
 
     @commands.cooldown(1, 4, commands.BucketType.user)
@@ -462,7 +456,7 @@ class CoinDrop(commands.Cog):
     @commands.check(utils.check_granted_server)
     @commands.command("reset_user")
     async def reset_user(self, ctx: commands.Context, user_id: str=''):
-        """Reset users' coin accounts"""
+        """Reset users' accounts"""
         if not self.bot.db_available.is_set():
             await ctx.send("No connection to database.")
             return
@@ -475,7 +469,7 @@ class CoinDrop(commands.Cog):
 
             confirm_text = f"confirm {random.randint(0, 999999):06}"
 
-            await ctx.send(f"Are you sure? This user has {record['gifts_sent']} coins, last picking one up at "
+            await ctx.send(f"Are you sure? This user has {record['gifts_sent']} gifts sent, last picking one up at "
                            f"{record['last_gift']} UTC. (type '{confirm_text}' or 'cancel')")
 
             def wait_check(msg):
@@ -497,4 +491,4 @@ class CoinDrop(commands.Cog):
                 await ctx.send(f"Cleared entry for {user_id}")
 
 def setup(bot):
-    bot.add_cog(CoinDrop(bot))
+    bot.add_cog(GiftDrop(bot))
