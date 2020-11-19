@@ -66,8 +66,11 @@ gift_strings = [
   "🎁 {0} just sent a 🏆 Trophy to {1}. This is when you celebrate your moment of victory, if you had one!"
 ]
 [reward_roles]
-# Roles given to users once they reach a certain coin threshold
-70 = 778778734500380722
+# Roles given to users once they reach a certain gift sent and gift receive threshold
+# The role is given only if both thresholds are met
+roles_list = [
+  {nbSent = 70, nbReceived = 30, roleId = 778778734500380722}
+]
 
 [database]
 # The keyword arguments that get passed into database connectors.

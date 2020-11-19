@@ -182,12 +182,25 @@ class CoinDrop(commands.Cog):
         rewards = self.bot.config.get('reward_roles', {})
         await self.bot.get_channel(778410033926897685).send(random.choice(self.bot.config.get("gift_strings")).format(f"**{user_nickname}**", f"**{target_user_nickname}**"))
         
-        # TO-DO: Find a way to count gifts recieved in the reward role
-        rewards = self.bot.config.get('reward_roles', {})
-        if gifts_sent not in rewards:
-            return
+        # Check if the user reached the gifts sent/received thresholds
+        giveRole = False
+        roleToCheck = None
+        for role_params in rewards["roles_list"]:
+            if (gifts_sent == role_params["nbSent"] and gifts_received >= role_params["nbReceived"]) or (gifts_sent >= role_params["nbSent"] and gifts_received == role_params["nbReceived"]):
+                giveRole = True
+                roleToCheck = role_params["roleId"]
 
-        role = member.guild.get_role(rewards[gifts_sent])
+        # Stop if no new threshold is met
+        if not giveRole:
+            return
+        
+        # Stop if the user already has the given role (to prevent adding the same role multiple times on a member)
+        for role in member.roles:
+            if role.id == roleToCheck:
+                return
+
+        # Add the role to the user
+        role = roleToCheck
 
         if role is None:
             self.bot.logger.warning(f'Failed to find reward role for {gifts_sent} gifts sent.')
