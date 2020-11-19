@@ -7,14 +7,12 @@ drop_channels = [
 present_log = 778410033926897685
 cooldown_time = 20  # seconds for cooldown
 
-recovery_time = 10  # seconds for probability to recover after cooldown expires
-
 drop_chance = 1  # chance for drop per message as float (0.1 is 10%, etc)
 
-additional_delay = 10  # time where extra coins can be gotten
 
 admin_users = [
-  248245568004947969
+  248245568004947969,
+  240973228632178689
 ]
 
 # a list of guild IDs to pull static emotes from
@@ -26,7 +24,6 @@ emoji_sources = [
   396144014128054275,
   494946907181809667
 ]
-
 gift_colors = [ 
   'red',
   'blue',
@@ -47,7 +44,7 @@ try_again = [
   "Let's try again.",
   "There is another label on the bottom of the present."
 ]
-embed_url = 'https://cdn.discordapp.com/attachments/542422265254641674/778729426522341396/googlegiftmintavatar.png'
+embed_url = 'https://cdn.discordapp.com/attachments/542422265254641674/778763462759022632/googlegiftmintavatarmini.png'
 
 gift_strings = [
   "🎁 {0} just sent a 🏈 Football to {1}. John Madden is proud of you.",
@@ -68,14 +65,9 @@ gift_strings = [
   "🎁 {0} just sent a 🏎️ Toy car to {1}. The toy car managed to give hours of entertainment successfully.",
   "🎁 {0} just sent a 🏆 Trophy to {1}. This is when you celebrate your moment of victory, if you had one!"
 ]
-
 [reward_roles]
 # Roles given to users once they reach a certain coin threshold
-100 = 518188361547120640
-
-[currency]
-singular = "<:blobcoin:386630453224013824> **Blob Coin**"
-plural = "<:blobcoin:386630453224013824> **Blob Coins**"
+70 = 778778734500380722
 
 [database]
 # The keyword arguments that get passed into database connectors.
