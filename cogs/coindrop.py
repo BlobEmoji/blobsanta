@@ -367,8 +367,12 @@ class CoinDrop(commands.Cog):
         while len(listing) > 0:
             embed.add_field(name='\u200b', value="\n".join(listing[:24]))
             del listing[:24]
-        await ctx.send(embed=embed)
-
+        try:
+            await ctx.author.send(embed=embed)
+            await ctx.message.delete()
+        except (discord.Forbidden, discord.HTTPException):
+            pass
+        
     @commands.check(utils.check_granted_server)
     @commands.command("reset")
     async def reset(self, ctx: commands.Context):
