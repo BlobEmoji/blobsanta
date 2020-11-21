@@ -304,16 +304,16 @@ class GiftDrop(commands.Cog):
                         """
                         INSERT INTO user_data (user_id, nickname)
                         VALUES ($1, $2)
-                        ON CONFLICT (nickname) DO UPDATE
-                        SET nickname = $3
+                        ON CONFLICT (nickname) DO NOTHING
                         RETURNING *
                         """,
-
                         ctx.author.id,
-                        nickname if nickname != '' else ctx.author.display_name,
-                        str(ctx.author.id), ## TO-DO change this to something more visually pleasant
+                        nickname if nickname != '' else ctx.author.display_name
                     )
-                await ctx.send(f"{ctx.author.mention} has joined the Blob Santa Event as **{ret_value['nickname']}**!")
+                    if ret_value is None:
+                        await ctx.send(f"{ctx.author.mention} Sorry, that name is already taken. Please try a different nickname with `.join <nickname>`.")
+                    else:
+                        await ctx.send(f"{ctx.author.mention} has joined the Blob Santa Event as **{ret_value['nickname']}**!")
             else:
                 await ctx.send(f"{ctx.author.mention} You have already joined the event. You can ask a staff member to change your nickname.")
 
