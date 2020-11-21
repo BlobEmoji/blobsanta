@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import asyncio
+from asyncpg.exceptions import UniqueViolationError 
 import random
 from datetime import datetime
 
@@ -333,6 +334,46 @@ class GiftDrop(commands.Cog):
             else:
                 await ctx.send(f"{target.mention} {record['nickname']} has sent {record['gifts_sent']} and received {record['gifts_received']} gifts.")
 
+    @commands.has_permissions(ban_members=True)
+    @commands.check(utils.check_granted_server)
+    @commands.command("change_nickname")
+    async def change_nickname_command(self, ctx: commands.Context, target: discord.Member, nickname: str=''):
+        """Check another user's gifts"""
+        if not self.bot.db_available.is_set():
+            return
+
+        if nickname == '':
+            await ctx.send(f"{ctx.author.mention} Please supply a nickname for the user with `.change_nickname <user> <nickname>`")
+            return
+        
+        results = test_username(nickname, ctx)
+        if len(results) > 0:
+            joined = ',\n'.join(results)
+            await ctx.send(f"{ctx.author.mention}, {joined}")
+            return
+
+        async with self.bot.db.acquire() as conn:
+             async with conn.transaction():
+                try:
+                    ret_value = await conn.fetchrow(
+                        """
+                        UPDATE user_data 
+                        SET nickname = $2
+                        WHERE user_id = $1
+                        RETURNING *
+                        """,
+                        target.id, 
+                        nickname
+                    )
+                    if ret_value is None:
+                        await ctx.send(f"{ctx.author.mention} Sorry, that user has not joined the event yet.")
+                    else:
+                        await ctx.send(f"{ctx.author.mention}, The nickname was successfully changed to **{ret_value['nickname']}**!")
+                except UniqueViolationError:
+                    await ctx.send(f"{ctx.author.mention} Sorry, that name is already taken.")
+                    pass
+                
+            
     @commands.cooldown(1, 4, commands.BucketType.user)
     @commands.cooldown(1, 1.5, commands.BucketType.channel)
     @commands.command("stats")
