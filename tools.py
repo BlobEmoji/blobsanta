@@ -39,7 +39,7 @@ def secret_substring(name: str) -> str:
     length = random.randint(3, 4)
     start = random.randint(0, len(name) - length)
     result = name[start:start + length]
-    return f"Part of the label has been cut off! The remaining label contains: `{result}`"
+    return f"Label contains: `{result}`"
 
 
 def secret_smudge(name: str) -> str:
@@ -48,14 +48,14 @@ def secret_smudge(name: str) -> str:
     for i in smudged:
         result[i] = '#'
     result = ''.join(result)
-    return f"The label has smudges on it. You can only make out the following letters: `{result}`"
+    return f"Find the missing letters: `{result}`"
 
 
 def secret_scramble(name: str) -> str:
     scrambled = list(name)
     random.shuffle(scrambled)
     result = ''.join(scrambled)
-    return f"Someone scrambled the letters on the label. It reads: `{result}`"
+    return f"Unscramble: `{result}`"
 
 
 def secret_string_wrapper(secret_member: str) -> str:

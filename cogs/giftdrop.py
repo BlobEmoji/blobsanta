@@ -21,7 +21,6 @@ class GiftDrop(commands.Cog):
         self.http = None
         self.session = None
         self.bot = bot
-        self.drop_lock = asyncio.Lock()
         self.acquire_lock = asyncio.Lock()
         self.current_gifters = []
 
@@ -55,9 +54,6 @@ class GiftDrop(commands.Cog):
         if message.channel.id not in self.bot.config.get("drop_channels", []):
             return
 
-        if self.drop_lock.locked():
-            return
-
         # Ignore messages that are more likely to be spammy
         if len(message.content) < 5:
             return
@@ -71,31 +67,30 @@ class GiftDrop(commands.Cog):
 
                         self.bot.loop.create_task(self.create_gift(message.author, message.created_at))
 
-    async def perform_natural_drop(self, user, secret_member, first_attempt):
-        async with self.drop_lock:
-            secret_string = secret_string_wrapper(secret_member)
-            
-            gift_colors = self.bot.config.get('gift_colors')
+    async def perform_natural_drop(self, user, secret_member, first_attempt, gift_icon_index):
+    
+        secret_string = secret_string_wrapper(secret_member)
 
-            new_present = "You found a {0} present with a {1} ribbon!".format(random.choice(gift_colors), random.choice(gift_colors))
-            try_again = random.choice(self.bot.config.get('try_again'))
-
-            drop_string = "{0} {1} Fix the label and send the gift by typing the proper label.".format(
-                new_present if first_attempt else try_again,
-                secret_string
-            )                
-
-            await user.send(drop_string)
+        embed = discord.Embed(
+            title='New Gift!' if first_attempt else 'Try Again!',
+            description='Type the name of the finished label to send the gift!' if first_attempt else 'You have another chance. Type the name of \nthe finished label to send the gift!',
+            color=0xff0000 if first_attempt else 0xff8500
+        )
+        embed.set_thumbnail(url=self.bot.config.get('gift_icons')[gift_icon_index])
+        embed.add_field(name='Hint', value=secret_string)
+        if not first_attempt:
+            embed.set_footer(text=random.choice(self.bot.config.get('hints')))
+        await user.send(embed=embed)
 
     async def create_gift(self, member, when):
         async with self.bot.db.acquire() as conn:
 
             secret_member_obj = {}
             first_attempt = True
-
+            gift_icon_index = None
             ret_value = await conn.fetchrow(
                 """
-                SELECT nickname, user_data.user_id
+                SELECT nickname, user_data.user_id, gift_icon
                 FROM gifts
                 INNER JOIN user_data
                 ON target_user_id = user_data.user_id
@@ -107,11 +102,12 @@ class GiftDrop(commands.Cog):
                 self.current_gifters.append(member.id)
             if ret_value is not None:
                 first_attempt = False
+                gift_icon_index = ret_value['gift_icon']
                 secret_member_obj = ret_value
             else:
                 ret_value = await conn.fetch("SELECT nickname, user_id FROM user_data WHERE user_id != $1", member.id)
                 secret_members = [x for x in ret_value]
-                self.bot.logger.info(secret_members)
+                gift_icon_index = random.randint(0, len(self.bot.config.get('gift_icons'))-1)
                 if not secret_members:
                     self.bot.logger.error(f"I wanted to drop a gift, but I couldn't find any members to send to!")
                     return
@@ -119,8 +115,7 @@ class GiftDrop(commands.Cog):
 
             secret_member = secret_member_obj['nickname']
             target_user_id = secret_member_obj['user_id']
-
-
+            
             async with conn.transaction():
                 await conn.fetch(
                     """
@@ -134,13 +129,14 @@ class GiftDrop(commands.Cog):
                 if first_attempt:
                     await conn.fetch(
                         """
-                        INSERT INTO gifts (user_id, target_user_id)
-                            VALUES ($1, $2)
+                        INSERT INTO gifts (user_id, target_user_id, gift_icon)
+                            VALUES ($1, $2, $3)
                         """,
                         member.id,
-                        target_user_id
+                        target_user_id,
+                        gift_icon_index
                     )
-        await self.perform_natural_drop(member, secret_member, first_attempt)
+        await self.perform_natural_drop(member, secret_member, first_attempt, gift_icon_index)
 
     async def _add_score(self, user_id, when):
         await self.bot.db_available.wait()
@@ -150,13 +146,13 @@ class GiftDrop(commands.Cog):
                 gift = await conn.fetchrow(
                     """
                     UPDATE gifts
-                    SET active = FALSE
+                    SET active = FALSE, is_sent = TRUE
                     WHERE user_id = $1 AND active = TRUE
-                    RETURNING target_user_id 
+                    RETURNING target_user_id, gift_icon
                     """,
                     user_id
                 )
-                target_user_nickname = await conn.fetchrow(
+                target_user = await conn.fetchrow(
                     """
                     UPDATE user_data
                     SET gifts_received = gifts_received + 1
@@ -175,19 +171,40 @@ class GiftDrop(commands.Cog):
                     user_id,
                     when
                 )
-                return current_user['nickname'], current_user['gifts_sent'], current_user['gifts_received'], target_user_nickname['nickname']
+
+                ret_gift = {
+                    'gift_icon': self.bot.config.get('gift_icons')[gift['gift_icon']]
+                }
+                ret_user = {
+                    'nickname': current_user['nickname'],
+                    'gifts_sent': current_user['gifts_sent'],
+                    'gifts_received': current_user['gifts_received']
+                }
+                ret_target = {
+                    'user_id': gift['target_user_id'],
+                    'nickname': target_user['nickname'],
+                    'avatar_url': (await self.bot.fetch_user(gift['target_user_id'])).avatar_url_as(format=None, static_format='webp', size=256)
+                }
+                return ret_gift, ret_user, ret_target
 
     async def add_score(self, member, when):
-        user_nickname, gifts_sent, gifts_received, target_user_nickname = await self._add_score(member.id, when)
-        await member.send(f"You successfully sent the gift to {target_user_nickname}! (Total gifts sent: {gifts_sent})")
+        gift, user, target = await self._add_score(member.id, when)
+        embed = discord.Embed(
+            description=f"**TO:** {target['nickname']}\n**FROM:** {user['nickname']}",
+            color=0x69e0a5)
+        embed.set_thumbnail(url=target['avatar_url'])
+        embed.set_author(name="Gift Sent!", icon_url=gift['gift_icon'])
+        embed.set_footer(text=f"Total Gifts Sent: {user['gifts_sent']}")
+        await member.send(embed=embed)
         rewards = self.bot.config.get('reward_roles', {})
-        await self.bot.get_channel(778410033926897685).send(random.choice(self.bot.config.get("gift_strings")).format(f"**{user_nickname}**", f"**{target_user_nickname}**"))
+        await self.bot.get_channel(778410033926897685).send(random.choice(self.bot.config.get("gift_strings")).format(f"**{user['nickname']}**", f"**{target['nickname']}**"))
         
         # Check if the user reached the gifts sent/received thresholds
         giveRole = False
         roleToCheck = None
+        # TO-DO: Fix. This is checking roles in dm and not guild. Does not account for the case when the gift's recieved goes over the required before this check happens
         for role_params in rewards["roles_list"]:
-            if (gifts_sent == role_params["nbSent"] and gifts_received >= role_params["nbReceived"]) or (gifts_sent >= role_params["nbSent"] and gifts_received == role_params["nbReceived"]):
+            if (user['gifts_sent'] == role_params["nbSent"] and user['gifts_received'] >= role_params["nbReceived"]) or (user['gifts_sent'] >= role_params["nbSent"] and user['gifts_received'] == role_params["nbReceived"]):
                 giveRole = True
                 roleToCheck = role_params["roleId"]
 
@@ -204,13 +221,13 @@ class GiftDrop(commands.Cog):
         role = roleToCheck
 
         if role is None:
-            self.bot.logger.warning(f'Failed to find reward role for {gifts_sent} gifts sent.')
+            self.bot.logger.warning(f"Failed to find reward role for {user['gifts_sent']} gifts sent.")
             return
 
         try:
-            await member.add_roles(role, reason=f'Reached {gifts_sent} gifts sent reward.')
+            await member.add_roles(role, reason=f"Reached {user['gifts_sent']} gifts sent reward.")
         except discord.HTTPException:
-            self.bot.logger.exception(f'Failed to add reward role for {gifts_sent} gifts sent to {member!r}.')
+            self.bot.logger.exception(f"Failed to add reward role for {user['gifts_sent']} gifts sent to {member!r}.")
     @commands.cooldown(1, 4, commands.BucketType.user)
     @commands.cooldown(1, 1.5, commands.BucketType.channel)
     @commands.command("check")
