@@ -1,5 +1,3 @@
--- TODO: this
-
 CREATE TABLE IF NOT EXISTS user_data (
     user_id BIGINT PRIMARY KEY,
 
@@ -20,8 +18,12 @@ CREATE TABLE IF NOT EXISTS gifts (
     user_id BIGINT NOT NULL REFERENCES user_data ON DELETE CASCADE,
 
     target_user_id BIGINT NOT NULL REFERENCES user_data ON DELETE CASCADE,
+    
+    gift_icon INT NOT NULL,
 
     active BOOLEAN DEFAULT true,
     
+    is_sent BOOLEAN DEFAULT false,
+
     activated_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
