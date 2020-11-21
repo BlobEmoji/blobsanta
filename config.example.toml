@@ -10,6 +10,7 @@ cooldown_time = 30  # seconds for cooldown
 drop_chance = 0.1  # chance for drop per message as float (0.1 is 10%, etc)
 
 
+
 admin_users = [
   248245568004947969,
   240973228632178689
@@ -24,27 +25,16 @@ emoji_sources = [
   396144014128054275,
   494946907181809667
 ]
-gift_colors = [ 
-  'red',
-  'blue',
-  'green',
-  'purple',
-  'yellow',
-  'orange',
-  'mint',
-  'pink',
-  'magenta',
-  'black',
-  'white',
-  'gray',
-  'brown'
-]
-try_again = [
-  "You found another label on the side of the present.",
-  "Let's try again.",
-  "There is another label on the bottom of the present."
+hints = [
+  'Stuck? Type ".list" to show a list of participating names.',
+  'Stuck? Type ".giveup" to give up on this present and get a new one next time.'
 ]
 embed_url = 'https://cdn.discordapp.com/attachments/542422265254641674/778763462759022632/googlegiftmintavatarmini.png'
+
+gift_icons = [
+  'https://cdn.discordapp.com/attachments/542422265254641674/779813774403567626/googlegiftpink.png',
+  'https://cdn.discordapp.com/attachments/542422265254641674/779813916175368222/googlegiftred.png'
+]
 
 gift_strings = [
   "🎁 {0} just sent a 🏈 Football to {1}. John Madden is proud of you.",
@@ -76,12 +66,10 @@ gift_strings = [
   "🎁 {0} just sent a 💻 Laptop to {1}. It's portable and powerful."
 ]
 [reward_roles]
-# Roles given to users once they reach a certain gift sent and gift receive threshold
-# The role is given only if both thresholds are met
+# Roles given to users once they reach a certain coin threshold
 roles_list = [
   {nbSent = 70, nbReceived = 30, roleId = 778778734500380722}
 ]
-
 [database]
 # The keyword arguments that get passed into database connectors.
 # If you're using the docker-compose, you do not need to change this.
