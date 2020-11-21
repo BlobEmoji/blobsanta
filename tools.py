@@ -18,7 +18,7 @@ def test_username(nickname: str, ctx: commands.Context) -> list:
         errors.append(f"Your {verbal_test} is too short. It need to be at least 5 characters.")
     if len(string_to_test) > 25:
         errors.append(f"Your {verbal_test} is too long. It needs to be under 25 characters.")
-    if not string_to_test.isalpha():
+    if not (string_to_test.isalpha() and string_to_test.isascii()):
         errors.append(f"Please only use alphabetical characters in your {verbal_test}.")
     return errors
 
