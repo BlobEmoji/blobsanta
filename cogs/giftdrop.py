@@ -2,8 +2,9 @@
 import asyncio
 from asyncpg.exceptions import UniqueViolationError 
 import random
-from datetime import datetime
-
+from datetime import datetime,timedelta
+import numpy as np
+import io
 import discord
 from discord.ext import commands
 
@@ -27,6 +28,10 @@ class GiftDrop(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
 
+        
+        if message.content.startswith("."):
+            return  # do not drop gifts on commands
+
         immediate_time = datetime.utcnow()
         if message.author.id in self.current_gifters and not message.guild:
             async with self.bot.db.acquire() as conn:
@@ -45,11 +50,10 @@ class GiftDrop(commands.Cog):
                     self.bot.loop.create_task(self.add_score(message.author, message.created_at))
                     self.bot.logger.info(f"User {message.author.id} guessed gift ({gift['nickname']}) in "
                                      f"{(immediate_time - last_gift).total_seconds()} seconds.")
+                else:
+                    await message.add_reaction('<:redtick:567088349484023818>')
             return
 
-
-        if message.content.startswith("."):
-            return  # do not drop gifts on commands
 
         if message.channel.id not in self.bot.config.get("drop_channels", []):
             return
@@ -72,7 +76,7 @@ class GiftDrop(commands.Cog):
         secret_string = secret_string_wrapper(secret_member)
 
         embed = discord.Embed(
-            title='New Gift!' if first_attempt else 'Try Again!',
+            title='New Gift!' if first_attempt else 'Another Hint!',
             description='Type the name of the finished label to send the gift!' if first_attempt else 'You have another chance. Type the name of \nthe finished label to send the gift!',
             color=0xff0000 if first_attempt else 0xff8500
         )
@@ -511,6 +515,57 @@ class GiftDrop(commands.Cog):
                 await conn.execute("DELETE FROM user_data WHERE user_id <= 10000")
             await ctx.send(f"Cleared entry for dummies")
     
+    @commands.has_permissions(ban_members=True)
+    @commands.check(utils.check_granted_server)
+    @commands.command("extract_data")
+    async def extract_data_command(self, ctx: commands.Context, mode: str='', n_bins: int=100):
+        """Timeseries csv file for data visualization"""
+        if not self.bot.db_available.is_set():
+            await ctx.send("No connection to database.")
+            return
+        
+        async with self.bot.db.acquire() as conn:
+            record = await conn.fetchrow("SELECT MIN(activated_date) as min_date, MAX(activated_date) as max_date FROM gifts")
+            minutes = int((record['max_date']-record['min_date']).total_seconds()/60/n_bins)
+            bins = [(record['min_date'] + timedelta(minutes=minutes*i)) for i in range(n_bins)]
+            features = ['name', 'pic'] + [x.strftime('%m/%d %H:%M') for x in bins]
+            data = []
+            data.append(features)
+            if mode in ['', 'users']:
+                users = await conn.fetch("SELECT user_id,nickname FROM user_data")
+                for user in users:
+                    dates = np.array([np.datetime64(date['activated_date']) for date in await conn.fetch("SELECT activated_date FROM gifts WHERE user_id = $1 AND is_sent = TRUE", user['user_id'])]).view('i8')
+
+                    inds = list(np.digitize(dates, np.array(bins, dtype='datetime64').view('i8')))
+                    row = [user['nickname'], str((await self.bot.fetch_user(user['user_id'])).avatar_url_as(format='png', static_format='png', size=128))] + [0 for x in range(len(bins))]
+                    count = 0
+                    for i in range(len(row)-2):
+                        for ind in inds:
+                            if ind == i:
+                                count += 1
+                        row[i+2] = count
+                        
+                    data.append(row)
+            elif mode == 'presents':
+                presents = [x for x in range(len(self.bot.config.get('gift_icons')))]
+                for present in presents:
+                    dates = np.array([np.datetime64(date['activated_date']) for date in await conn.fetch("SELECT activated_date FROM gifts WHERE gift_icon = $1 AND is_sent = TRUE", present)]).view('i8')
+
+                    inds = list(np.digitize(dates, np.array(bins, dtype='datetime64').view('i8')))
+                    row = [present, self.bot.config.get('gift_icons')[present]] + [0 for x in range(len(bins))]
+                    count = 0
+                    for i in range(len(row)-2):
+                        for ind in inds:
+                            if ind == i:
+                                count += 1
+                        row[i+2] = count
+                        
+                    data.append(row)
+            text = "\n".join(','.join([str(s) for s in x]) for x in data)
+            await ctx.send(file=discord.File(filename="stats.csv", fp=io.BytesIO(text.encode("utf8"))))
+
+
+
     @commands.has_permissions(ban_members=True)
     @commands.check(utils.check_granted_server)
     @commands.command("reset_user")
