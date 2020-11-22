@@ -31,9 +31,44 @@ hints = [
 ]
 embed_url = 'https://cdn.discordapp.com/attachments/542422265254641674/778763462759022632/googlegiftmintavatarmini.png'
 
+gift_emojis = [
+  '<:googlegiftyellow2:779906229119615017>',
+  '<:googlegiftyellow:779906229094711296>',
+  '<:googlegiftwhite:779906228956299264>',
+  '<:googlegiftred2:779906229052243978>',
+  '<:googlegiftred:779906229237579786>',
+  '<:googlegiftpurple:779906229082390539>',
+  '<:googlegiftpink2:779906229060763658>',
+  '<:googlegiftpink:779906228977401866>',
+  '<:googlegiftowo:779906229187117116>',
+  '<:googlegiftorange:779906228913831957>',
+  '<:googlegiftmint:779906228943978516>',
+  '<:googlegiftindigo:779906228964294666>',
+  '<:googlegiftgreen:779906228931133440>',
+  '<:googlegiftgray:779906228838334485>',
+  '<:googlegiftbrown:779906228830076959>',
+  '<:googlegiftblue:779906228507377735>',
+  '<:googlegiftblack:779906228238680095>'
+]
+
 gift_icons = [
-  'https://cdn.discordapp.com/attachments/542422265254641674/779813774403567626/googlegiftpink.png',
-  'https://cdn.discordapp.com/attachments/542422265254641674/779813916175368222/googlegiftred.png'
+  'https://cdn.discordapp.com/emojis/779865590189391893.png?v=1',
+  'https://cdn.discordapp.com/emojis/779865590096855092.png?v=1',
+  'https://cdn.discordapp.com/emojis/779865590357688371.png?v=1',
+  'https://cdn.discordapp.com/emojis/779865590516940811.png?v=1',
+  'https://cdn.discordapp.com/emojis/779865590260826174.png?v=1',
+  'https://cdn.discordapp.com/emojis/779865590566879252.png?v=1',
+  'https://cdn.discordapp.com/emojis/779865590810148915.png?v=1',
+  'https://cdn.discordapp.com/emojis/779865590483517482.png?v=1',
+  'https://cdn.discordapp.com/emojis/779865590495576104.png?v=1',
+  'https://cdn.discordapp.com/emojis/779865590549577748.png?v=1',
+  'https://cdn.discordapp.com/emojis/779865590504357948.png?v=1',
+  'https://cdn.discordapp.com/emojis/779865590517071902.png?v=1',
+  'https://cdn.discordapp.com/emojis/779865590310895647.png?v=1',
+  'https://cdn.discordapp.com/emojis/779865590584049674.png?v=1',
+  'https://cdn.discordapp.com/emojis/779865590516678656.png?v=1',
+  'https://cdn.discordapp.com/emojis/779865590487187496.png?v=1',
+  'https://cdn.discordapp.com/emojis/779865590504488970.png?v=1'
 ]
 
 gift_strings = [
@@ -63,7 +98,41 @@ gift_strings = [
   "🎁 {0} just sent a ⚾ Baseball to {1}. {1} catches it successfully!",
   "🎁 {0} just sent a 💿 CD to {1}. You already downloaded its content before.",
   "🎁 {0} just sent a 📀 DVD to {1}. There's nothing that can read its contents!",
-  "🎁 {0} just sent a 💻 Laptop to {1}. It's portable and powerful."
+  "🎁 {0} just sent a 💻 Laptop to {1}. It's portable and powerful.",
+  "🎁 {0} just sent 🇧🇷 Brazil to {1}. {1} is going there, and so are you.",
+  "🎁 {0} just sent a 🪃 Boomerang to {1}. They're certainly gonna get it back, though.",
+  "🎁 {0} just sent an 🥚 Egg to {1}. Can I offer you a nice egg in this trying time?",
+  "🎁 {0} just sent a 🦀 Crab to {1}. If you bring it close to your ear, you can hear what it sounds like to be attacked by a crab.",
+  "🎁 {0} just sent a 🖨️ Printer to {1}. It's cheaper than just buying new cartridges.",
+  "🎁 {0} just sent a 🕵️ Spy to {1}. Please don't tell them until the investigation has concluded.",
+  "🎁 {0} just sent ✂️ Scissors to {1}. They need another pair to open the wrapper though.",
+  "🎁 {0} just sent a 🥁 Drum to {1}. I believe {0} hates {1}'s parents.",
+  "🎁 {0} just sent a 💐 Bouquet to {1}. {1} blushes intensively.",
+  "🎁 {0} just sent 🥫 Dog Food to {1}. It might actually be for their dog, but who knows.",
+  "🎁 {0} just sent a 🛵 Scooter to {1}. By using it, {1} can change position.",
+  "🎁 {0} just sent a 🗨️ Text Balloon to {1}. This isn't a comic at all!",
+  "🎁 {0} just sent 💰 Money to {1}. Gifts are cool, but we all like cold hard cash too.",
+  "🎁 {0} just sent a 🏹 Bow to {1}. {1} doesn't know archery and expected something for their doll or pet.",
+  "🎁 {0} just sent a 🎃 Pumpkin to {1}. {0} still thinks that it's October.",
+  "🎁 {0} just sent an 🦉 Owl to {1}. An awesome friend, especially during sleepless nights.",
+  "🎁 {0} just sent a 🛑 Stop Sign to {1}. It has 8 fantastic sides and 8 awesome angles.",
+  "🎁 {0} just sent 🧻 Toilet Paper to {1}. A very expensive gift, take care of it.",
+  "🎁 {0} just sent 🧂 Salt to {1}. In case League of Legends doesn't bring enough.",
+  "🎁 {0} just sent a 🐀 Rat to {1}. It preys at night and stalks at night.",
+  "🎁 {0} just sent a 🌭 Hotdog to {1}. Still better than dog food I guess?",
+  "🎁 {0} just sent a 🎸 Guitar to {1}. After doing a sick guitar solo, {1} smashes it on the ground.",
+  "🎁 {0} just sent a 🤖 Bot to {1}. Let's hope it doesn't use JavaScript.",
+  "🎁 {0} just sent 👀 Eyes to {1}. Having a second pair of eyes on your work is always useful!",
+  "🎁 {0} just sent a 🦆 Duck to {1}. It's not as good as rubber ducks.",
+  "🎁 {0} just sent a 🦷 Tooth to {1}. You don't want to know where it comes from.",
+  "🎁 {0} just sent a 🪨 Rock to {1}. {1} counterattacks with paper!",
+  "🎁 {0} just sent a 🥖 Baguette to {1}. Ah oui, this is a very good cadeau.",
+  "🎁 {0} just sent a 🐛 Bug to {1}. As if they didn't write enough bad code already.",
+  "🎁 {0} just sent a 👑 Crown to {1}. Everyone bow to {1} XIV the Great now!",
+  "🎁 {0} just sent a 🏴‍☠️ Pirate Flag to {1}. Both decide to become pirates.",
+  "🎁 {0} just sent an 🧯 Extinguisher to {1}. If it ever catches fire itself, just put it away with the rest of the fire.",
+  "🎁 {0} just sent a 🧓 Boomer to {1}. People say \"ok boomer\" but never ask \"Are you ok, boomer?\"",
+  "🎁 {0} just sent an ⏰ Alarm Clock to {1}. The alarm rings, {1} was dreaming the whole time."
 ]
 [reward_roles]
 # Roles given to users once they reach a certain coin threshold
