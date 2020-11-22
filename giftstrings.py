@@ -66,9 +66,12 @@ giftstrings = [
   "🎁 {0} just sent a ♟ Pawn to {1}. Is this a challenge?",
   "🎁 {0} just sent an 🪓 Axe to {1}. {0} missed, thankfully.",
   "🎁 {0} just sent a 🪙 Coin to {1}. Due to past experiences, you dread the coin.",
-  "🎁 {0} just sent a 🧩 Jigsaw piece to {1}. The puzzle finally can be solved after all these years.",
+  "🎁 {0} just sent a 🧩 Jigsaw Piece to {1}. The puzzle finally can be solved after all these years.",
   "🎁 {0} just sent a 🛹 Skateboard to {1}. It's a perfect time to be a cool kid.",
   "🎁 {0} just sent a 🔫 Water Gun to {1}. Who would give murder machines to an innocent person?!",
   "🎁 {0} just sent a 😂 Joy Emoji to {1}. It's so foul, that not even a blob equivalent would be better.",
-  "🎁 {0} just sent a <:blob:530901399077388289> Blob to {1}. It has no feelings, no emotions, just blob."
+  "🎁 {0} just sent a <:blob:530901399077388289> Blob to {1}. It has no feelings, no emotions, just blob.",
+  "🎁 {0} just sent a 🌝 Moon to {1}. It crashes on Earth and {1} fails to stop it.",
+  "🎁 {0} just sent <:stairs:779924876286623784> Stairs to {1}. {0} warned them about the stairs but {1} fell down on them. It keeps happening.",
+  "🎁 {0} just sent a 📺 Television to {1}. It just keeps saying \"But wait, there's more!\"."
 ]
