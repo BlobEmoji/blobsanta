@@ -202,14 +202,16 @@ class GiftDrop(commands.Cog):
         embed.set_footer(text=f"Total Gifts Sent: {user['gifts_sent']}")
         await member.send(embed=embed)
         rewards = self.bot.config.get('reward_roles', {})
-        await self.bot.get_channel(778410033926897685).send(random.choice(giftstrings).format(f"**{user['nickname']}**", f"**{target['nickname']}**").replace('🎁', gift['gift_emoji']))
+        guild = (await self.bot.get_channel(778410033926897685).send(random.choice(giftstrings).format(f"**{user['nickname']}**", f"**{target['nickname']}**").replace('🎁', gift['gift_emoji']))).guild
         
         # Check if the user reached the gifts sent/received thresholds
+        guild_member = guild.get_member(member.id) or await guild.fetch_member(member.id)
         giveRole = False
         roleToCheck = None
-        # TO-DO: Fix. This is checking roles in dm and not guild. Does not account for the case when the gift's recieved goes over the required before this check happens
+    
         for role_params in rewards["roles_list"]:
-            if (user['gifts_sent'] == role_params["nbSent"] and user['gifts_received'] >= role_params["nbReceived"]) or (user['gifts_sent'] >= role_params["nbSent"] and user['gifts_received'] == role_params["nbReceived"]):
+            
+            if (user['gifts_sent'] >= role_params["nbSent"] and user['gifts_received'] >= role_params["nbReceived"]):
                 giveRole = True
                 roleToCheck = role_params["roleId"]
 
@@ -218,19 +220,19 @@ class GiftDrop(commands.Cog):
             return
         
         # Stop if the user already has the given role (to prevent adding the same role multiple times on a member)
-        for role in member.roles:
+        for role in guild_member.roles:
             if role.id == roleToCheck:
                 return
 
         # Add the role to the user
-        role = roleToCheck
+        role = guild.get_role(roleToCheck)
 
         if role is None:
             self.bot.logger.warning(f"Failed to find reward role for {user['gifts_sent']} gifts sent.")
             return
 
         try:
-            await member.add_roles(role, reason=f"Reached {user['gifts_sent']} gifts sent reward.")
+            await guild_member.add_roles(role, reason=f"Reached {user['gifts_sent']} gifts sent reward.")
         except discord.HTTPException:
             self.bot.logger.exception(f"Failed to add reward role for {user['gifts_sent']} gifts sent to {member!r}.")
     @commands.cooldown(1, 4, commands.BucketType.user)
