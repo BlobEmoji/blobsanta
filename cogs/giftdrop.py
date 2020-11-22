@@ -476,44 +476,6 @@ class GiftDrop(commands.Cog):
                 await conn.execute("DELETE FROM user_data WHERE user_id = $1", ctx.author.id)
 
             await ctx.send(f"Cleared entry for {ctx.author.id}")
-    # Testing purposes only
-    # DELETE LATER
-    @commands.check(utils.check_granted_server)
-    @commands.command("add_dummy")
-    async def add_dummy(self, ctx: commands.Context, nickname: str=''):
-        results = test_username(nickname, ctx)
-        if len(results) > 0:
-            joined = ',\n'.join(results)
-            await ctx.send(f"{ctx.author.mention}, {joined}")
-            return
-        async with self.bot.db.acquire() as conn:
-            async with conn.transaction():
-                ret_value = await conn.fetchval(
-                    """
-                    INSERT INTO user_data (user_id, nickname)
-                    VALUES ($1, $2)
-                    ON CONFLICT (nickname) DO UPDATE
-                    SET nickname = $3
-                    RETURNING nickname
-                    """,
-                    random.randint(0, 10000),
-                    nickname if nickname != '' else f"Dummy{random.randint(0, 100000)}",
-                    f"Dummy{random.randint(0, 100000)}",  ## TO-DO change this to something more visually pleasant
-                )
-                await ctx.send(f"Dummy has joined the Blob Santa Event as **{ret_value}**!")
-    # Testing purposes only
-    # DELETE LATER
-    @commands.check(utils.check_granted_server)
-    @commands.command("delete_dummies")
-    async def reset(self, ctx: commands.Context):
-        if not self.bot.db_available.is_set():
-            await ctx.send("No connection to database.")
-            return
-
-        async with self.bot.db.acquire() as conn:
-            async with conn.transaction():
-                await conn.execute("DELETE FROM user_data WHERE user_id <= 10000")
-            await ctx.send(f"Cleared entry for dummies")
     
     @commands.has_permissions(ban_members=True)
     @commands.check(utils.check_granted_server)
