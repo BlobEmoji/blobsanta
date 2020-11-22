@@ -173,7 +173,8 @@ class GiftDrop(commands.Cog):
                 )
 
                 ret_gift = {
-                    'gift_icon': self.bot.config.get('gift_icons')[gift['gift_icon']]
+                    'gift_icon': self.bot.config.get('gift_icons')[gift['gift_icon']],
+                    'gift_emoji': self.bot.config.get('gift_emojis')[gift['gift_icon']]
                 }
                 ret_user = {
                     'nickname': current_user['nickname'],
@@ -197,7 +198,7 @@ class GiftDrop(commands.Cog):
         embed.set_footer(text=f"Total Gifts Sent: {user['gifts_sent']}")
         await member.send(embed=embed)
         rewards = self.bot.config.get('reward_roles', {})
-        await self.bot.get_channel(778410033926897685).send(random.choice(self.bot.config.get("gift_strings")).format(f"**{user['nickname']}**", f"**{target['nickname']}**"))
+        await self.bot.get_channel(778410033926897685).send(random.choice(self.bot.config.get("gift_strings")).format(f"**{user['nickname']}**", f"**{target['nickname']}**").replace('🎁', gift['gift_emoji']))
         
         # Check if the user reached the gifts sent/received thresholds
         giveRole = False
