@@ -362,7 +362,7 @@ class GiftDrop(commands.Cog):
     @commands.check(utils.check_granted_server)
     @commands.command("change_nickname")
     async def change_nickname_command(self, ctx: commands.Context, target: discord.Member, nickname: str=''):
-        """Check another user's gifts"""
+        """Change another user's nickname"""
         if not self.bot.db_available.is_set():
             return
 
