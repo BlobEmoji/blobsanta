@@ -9,7 +9,7 @@ from discord.ext import commands
 
 from tools import test_username, check_has_gift, secret_string_wrapper
 from . import utils
-
+from giftstrings import giftstrings
 
 class Rollback(Exception):
     pass
@@ -198,7 +198,7 @@ class GiftDrop(commands.Cog):
         embed.set_footer(text=f"Total Gifts Sent: {user['gifts_sent']}")
         await member.send(embed=embed)
         rewards = self.bot.config.get('reward_roles', {})
-        await self.bot.get_channel(778410033926897685).send(random.choice(self.bot.config.get("gift_strings")).format(f"**{user['nickname']}**", f"**{target['nickname']}**").replace('🎁', gift['gift_emoji']))
+        await self.bot.get_channel(778410033926897685).send(random.choice(giftstrings).format(f"**{user['nickname']}**", f"**{target['nickname']}**").replace('🎁', gift['gift_emoji']))
         
         # Check if the user reached the gifts sent/received thresholds
         giveRole = False
