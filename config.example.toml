@@ -132,7 +132,12 @@ gift_strings = [
   "🎁 {0} just sent a 🏴‍☠️ Pirate Flag to {1}. Both decide to become pirates.",
   "🎁 {0} just sent an 🧯 Extinguisher to {1}. If it ever catches fire itself, just put it away with the rest of the fire.",
   "🎁 {0} just sent a 🧓 Boomer to {1}. People say \"ok boomer\" but never ask \"Are you ok, boomer?\"",
-  "🎁 {0} just sent an ⏰ Alarm Clock to {1}. The alarm rings, {1} was dreaming the whole time."
+  "🎁 {0} just sent an ⏰ Alarm Clock to {1}. The alarm rings, {1} was dreaming the whole time.",
+  "🎁 {0} just sent a 💍 Ring to {1}. {0} and {1} are now engaged!",
+  "🎁 {0} just sent a 🪵 Log to {1}. Does anyone even read this thing?",
+  "🎁 {0} just sent 🥢 Chopsticks to {1}. {1} has no idea how to use them.",
+  "🎁 {0} just sent a ♟ Pawn to {1}. Is this a challenge?",
+  "🎁 {0} just sent an 🪓 Axe to {1}. {0} missed, thankfully."
 ]
 [reward_roles]
 # Roles given to users once they reach a certain coin threshold
