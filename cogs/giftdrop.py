@@ -544,10 +544,25 @@ class GiftDrop(commands.Cog):
             bins = [(record['min_date'] + timedelta(seconds=seconds*i)) for i in range(n_bins)]
             features = ['name', 'pic'] + [x.strftime('%m/%d %H:%M') for x in bins]
             data = [features]
-            if mode in ['', 'users']:
+            if mode in ['', 'sent']:
                 users = await conn.fetch("SELECT user_id,nickname FROM user_data")
                 for user in users:
                     dates = np.array([np.datetime64(date['activated_date']) for date in await conn.fetch("SELECT activated_date FROM gifts WHERE user_id = $1 AND is_sent = TRUE", user['user_id'])]).view('i8')
+
+                    inds = list(np.digitize(dates, np.array(bins, dtype='datetime64').view('i8')))
+                    row = [user['nickname'], str((await self.bot.fetch_user(user['user_id'])).avatar_url_as(format='png', static_format='png', size=128))] + [0] * len(bins)
+                    count = 0
+                    for i in range(len(row)-2):
+                        for ind in inds:
+                            if ind == i:
+                                count += 1
+                        row[i+2] = count
+
+                    data.append(row)
+            elif mode == 'received':
+                users = await conn.fetch("SELECT user_id,nickname FROM user_data")
+                for user in users:
+                    dates = np.array([np.datetime64(date['activated_date']) for date in await conn.fetch("SELECT activated_date FROM gifts WHERE target_user_id = $1 AND is_sent = TRUE", user['user_id'])]).view('i8')
 
                     inds = list(np.digitize(dates, np.array(bins, dtype='datetime64').view('i8')))
                     row = [user['nickname'], str((await self.bot.fetch_user(user['user_id'])).avatar_url_as(format='png', static_format='png', size=128))] + [0] * len(bins)
