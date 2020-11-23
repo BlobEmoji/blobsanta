@@ -73,5 +73,6 @@ giftstrings = [
   "🎁 {0} just sent a <:blob:530901399077388289> Blob to {1}. It has no feelings, no emotions, just blob.",
   "🎁 {0} just sent a 🌝 Moon to {1}. It crashes on Earth and {1} fails to stop it.",
   "🎁 {0} just sent <:stairs:779924876286623784> Stairs to {1}. {0} warned them about the stairs but {1} fell down on them. It keeps happening.",
-  "🎁 {0} just sent a 📺 Television to {1}. It just keeps saying \"But wait, there's more!\"."
+  "🎁 {0} just sent a 📺 Television to {1}. It just keeps saying \"But wait, there's more!\".",
+  "🎁 {0} just sent a 💾 Floppy Disk to {1}. Don't copy that floppy!"
 ]
