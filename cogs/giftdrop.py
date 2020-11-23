@@ -436,8 +436,7 @@ class GiftDrop(commands.Cog):
                     if ret_value is None:
                         await ctx.send(f"{ctx.author.mention} Sorry, that user has not joined the event yet.")
                     else:
-                        await ctx.send(
-                            f"{ctx.author.mention}, The nickname was successfully changed to **{ret_value['nickname']}**!")
+                        await ctx.send(f"{ctx.author.mention}, The nickname was successfully changed to **{ret_value['nickname']}**!")
                 except UniqueViolationError:
                     await ctx.send(f"{ctx.author.mention} Sorry, that name is already taken.")
                     pass
