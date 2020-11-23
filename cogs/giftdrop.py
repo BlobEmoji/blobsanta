@@ -19,7 +19,7 @@ from . import utils
 class Rollback(Exception):
     pass
 
-  
+
 class GiftDrop(commands.Cog):
     def __init__(self, bot):
         super().__init__()
