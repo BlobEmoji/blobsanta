@@ -32,6 +32,7 @@ class GiftDrop(commands.Cog):
         self.label_stash = []
         self.log_stash = []
         self.users_last_channel = {}
+        self.last_label = None
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
@@ -124,23 +125,30 @@ class GiftDrop(commands.Cog):
                 if not secret_members:
                     self.bot.logger.error(f"I wanted to drop a gift, but I couldn't find any members to send to!")
                     return
+                # Create label list with the current user removed
                 available_members = [i for i, s in enumerate (self.label_stash) if secret_members[s]['user_id'] != member.id]
 
-                self.bot.logger.info(f"Available Members: {[secret_members[self.label_stash[i]]['nickname'] for i in available_members]}")
+                # When the list has no available label (excluding current user)
                 if len(available_members) == 0:
-                    self.label_stash = [*range(len(secret_members))]
+                    # Repopulate lists with latest user label removed
+                    self.label_stash = [i for i, s in enumerate (secret_members) if s['user_id'] != self.last_label]
                     available_members = [i for i, s in enumerate (self.label_stash) if secret_members[s]['user_id'] != member.id]
-
+                
                 last_stashed = None
-                if len(self.label_stash) == 1 and len(available_members) == 1:
-                    last_stashed = self.label_stash.pop(available_members[0]) 
 
-                if len(self.label_stash) == 0:
-                    self.label_stash = [*range(len(secret_members))]
-                    if last_stashed:
-                        self.label_stash.pop(available_members[0])
+                # When both the label stash and available labels have 1(same) item left
+                if len(self.label_stash) == 1 and len(available_members) == 1:
+                    # Store the last item
+                    last_stashed = self.label_stash[(available_members[0])] 
+                    # Repopulate label list removing the last item from list
+                    self.label_stash = [i for i, s in enumerate (secret_members) if s['user_id'] != secret_members[last_stashed]['user_id']]
+                
+                # Get the selected member object
                 secret_member_obj = secret_members[last_stashed or self.label_stash.pop(random.choice(available_members))]
                 
+                # Set the last label sent
+                self.last_label = secret_member_obj['user_id']
+
             secret_member = secret_member_obj['nickname']
             target_user_id = secret_member_obj['user_id']
 
