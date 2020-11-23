@@ -14,8 +14,8 @@ def test_username(nickname: str, ctx: commands.Context) -> list:
     else:
         verbal_test = "custom name"
 
-    if len(string_to_test) < 5:
-        errors.append(f"Your {verbal_test} is too short. It need to be at least 5 characters.")
+    if len(string_to_test) < 4:
+        errors.append(f"Your {verbal_test} is too short. It need to be at least 4 characters.")
     if len(string_to_test) > 25:
         errors.append(f"Your {verbal_test} is too long. It needs to be under 25 characters.")
     if string_to_test.lower().startswith("confirm"):
@@ -26,7 +26,7 @@ def test_username(nickname: str, ctx: commands.Context) -> list:
 
 
 def secret_substring(name: str) -> str:
-    length = random.randint(3, 4)
+    length = min(random.randint(3, 4),len(name)-1)
     start = random.randint(0, len(name) - length)
     result = name[start:start + length]
     return f"Label contains: `{result}`"
