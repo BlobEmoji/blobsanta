@@ -195,7 +195,7 @@ class GiftDrop(commands.Cog):
     async def add_score(self, member, when):
         gift, user, target = await self._add_score(member.id, when)
         embed = discord.Embed(
-            description=f"**TO:** {target['nickname']}\n**FROM:** {user['nickname']}",
+            description=f"**TO:** {target['nickname']}\n**FROM:** {user['nickname']}\nBack to Blobs: <#289482554250100736>",
             color=0x69e0a5)
         embed.set_thumbnail(url=target['avatar_url'])
         embed.set_author(name="Gift Sent!", icon_url=gift['gift_icon'])
