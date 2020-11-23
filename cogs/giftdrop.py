@@ -37,7 +37,7 @@ class GiftDrop(commands.Cog):
     async def on_message(self, message: discord.Message):
 
         # Do not drop gifts on commands
-        if message.content.startswith("."): return
+        if message.content.startswith(".") or message.content.lower().startswith("confirm"): return
 
         immediate_time = datetime.utcnow()
         if message.author.id in self.current_gifters and not message.guild:
