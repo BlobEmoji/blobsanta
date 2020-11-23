@@ -228,9 +228,9 @@ class GiftDrop(commands.Cog):
             return_id = self.bot.config.get('drop_channels')[0]
 
         description = f"""
-            **TO:** {target['nickname']}\n
-            **FROM:** {user['nickname']}\n
-            [← Back to {return_name}](https://discord.com/channels/{guild.id}/{return_id}/)"""
+**TO:** {target['nickname']}\n
+**FROM:** {user['nickname']}\n
+[← Back to {return_name}](https://discord.com/channels/{guild.id}/{return_id}/)"""
         embed = discord.Embed(description=description, color=0x69e0a5)
 
         embed.set_thumbnail(url=target['avatar_url'])
