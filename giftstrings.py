@@ -79,6 +79,6 @@ giftstrings = [ # Gift emoji will be prefixed to these strings.
   "{0} just sent a <:googlebee:612122990338899995> Bee. According to all laws of gift distribution, a bee shouldn't be a gift.",
   "{0} just sent a <:greentick:567088336166977536> Green Tick to {1}. <:greentick:567088336166977536> moved to <#289847856033169409>: {1} (by {0})",
   "{0} just sent a 🎁 Gift to {1}. Inside the gift that was inside another gift, there's nothing.",
-  "{0} just sent a <:redtick:567088349484023818> Red Tick to {1}, It represents the denial from {1}.",
+  "{0} just sent a <:redtick:567088349484023818> Red Tick to {1}. {1} isn't being added as an emoji today.",
   "{0} just sent a 🔮 Crystal Ball to {1}. The future has been revealed to {1}."
 ]
