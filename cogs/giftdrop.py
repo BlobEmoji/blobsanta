@@ -32,7 +32,7 @@ class GiftDrop(commands.Cog):
         self.label_stash = []
         self.log_stash = []
         self.users_last_channel = {}
-        
+
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
 
@@ -220,7 +220,7 @@ class GiftDrop(commands.Cog):
         log_channel = self.bot.get_channel(self.bot.config.get("present_log"))
         guild = log_channel.guild
 
-        if member.id in self.users_last_channel: 
+        if member.id in self.users_last_channel:
             return_name = f"#{self.users_last_channel[member.id]['name']}"
             return_id = self.users_last_channel[member.id]['id']
         else:
@@ -239,13 +239,13 @@ class GiftDrop(commands.Cog):
         await member.send(embed=embed)
 
         rewards = self.bot.config.get('reward_roles', {})
-        
+
         if len(self.log_stash) <= 1 or random.randint(0, 100) < 3:
             self.log_stash = [*range(len(giftstrings))]
 
-        log_message = f'{gift["gift_emoji"]} {giftstrings[self.log_stash.pop(random.randrange(len(self.log_stash)))]}' 
+        log_message = f'{gift["gift_emoji"]} {giftstrings[self.log_stash.pop(random.randrange(len(self.log_stash)))]}'
         await log_channel.send(log_message.format(f"**{user['nickname']}**", f"**{target['nickname']}**"))
-        
+
         # Check if the user reached the gifts sent/received thresholds
         guild_member = guild.get_member(member.id) or await guild.fetch_member(member.id)
         give_role = False
@@ -399,16 +399,15 @@ class GiftDrop(commands.Cog):
     @commands.has_permissions(ban_members=True)
     @commands.check(utils.check_granted_server)
     @commands.command("change_nickname")
-    async def change_nickname_command(self, ctx: commands.Context, target: discord.Member, nickname: str=''):
+    async def change_nickname_command(self, ctx: commands.Context, target: discord.Member, nickname: str = ''):
         """Change another user's nickname"""
         if not self.bot.db_available.is_set():
             return
 
         async with self.bot.db.acquire() as conn:
-            if not check_is_in(conn, ctx.author.id):
+            if not check_is_in(conn, target.id):
                 await ctx.send(
-                    f"{ctx.author.mention} Hey, you can't your nickname if you aren't participating.\n"
-                    f"Feel free to join with `.join`"
+                    f"{ctx.author.mention} Hey, {target.mention} doesn't seem to be participating currently."
                 )
 
         if nickname == '':
