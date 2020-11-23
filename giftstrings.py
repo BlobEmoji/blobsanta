@@ -82,7 +82,7 @@ giftstrings = [ # Gift emoji will be prefixed to these strings.
   "{0} just sent a <:redtick:567088349484023818> Red Tick to {1}. {1} isn't being added as an emoji today.",
   "{0} just sent a 🔮 Crystal Ball to {1}. The future has been revealed to {1}."
   "{0} just sent a 👾 Space Invader to {1}. {1} is doomed, DOOMED!"
-  "{0} just sent a ♟️️Pawn to {1}. Checkmate!"
+  "{0} just sent a ♟️️ Pawn to {1}. Checkmate!"
   "{0} just sent a 🥧️ Pie to {1}. I wonder if it can tell the time..."
   "{0} just sent a 🐉 Dragon to {1}. King Dragon sends his regards."
   "{0} just sent a 🪕 Banjo to {1}. Hey, where's Kazooie?"
