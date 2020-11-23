@@ -232,10 +232,10 @@ class GiftDrop(commands.Cog):
         if len(self.log_stash) <= 1 or random.randint(0,100) < 3:
             self.log_stash = [*range(len(giftstrings))]
 
-        log_message = giftstrings[self.log_stash.pop(random.randrange(len(self.log_stash)))]
+        log_message = f'{gift["gift_emoji"]} {giftstrings[self.log_stash.pop(random.randrange(len(self.log_stash)))]}' 
         log_channel = self.bot.get_channel(self.bot.config.get("present_log"))
 
-        await log_channel.send(log_message.format(f"**{user['nickname']}**", f"**{target['nickname']}**").replace('🎁', gift['gift_emoji']))
+        await log_channel.send(log_message.format(f"**{user['nickname']}**", f"**{target['nickname']}**"))
         
         # Check if the user reached the gifts sent/received thresholds
         guild = log_channel.guild
