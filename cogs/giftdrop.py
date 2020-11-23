@@ -77,7 +77,6 @@ class GiftDrop(commands.Cog):
                         self.bot.loop.create_task(self.create_gift(message.author, message.created_at))
 
     async def perform_natural_drop(self, user, secret_member, first_attempt, gift_icon_index):
-    
         secret_string = secret_string_wrapper(secret_member)
 
         embed = discord.Embed(
@@ -219,6 +218,7 @@ class GiftDrop(commands.Cog):
 
     async def add_score(self, member, when):
         gift, user, target = await self._add_score(member.id, when)
+
         embed = discord.Embed(
             description=f"**TO:** {target['nickname']}\n**FROM:** {user['nickname']}\n[← Back to chat](https://canary.discord.com/channels/272885620769161216/{self.bot.config.get('drop_channels')[0]}/)",
             color=0x69e0a5)
@@ -226,26 +226,29 @@ class GiftDrop(commands.Cog):
         embed.set_author(name="Gift Sent!", icon_url=gift['gift_icon'])
         embed.set_footer(text=f"Total Gifts Sent: {user['gifts_sent']}")
         await member.send(embed=embed)
+
         rewards = self.bot.config.get('reward_roles', {})
+
         if len(self.log_stash) <= 1 or random.randint(0,100) < 3:
             self.log_stash = [x for x in range(len(giftstrings))]
+
         log_message = giftstrings[self.log_stash.pop(random.choice([x for x in range(len(self.log_stash))]))]
-        guild = (await self.bot.get_channel(778410033926897685).send(log_message.format(f"**{user['nickname']}**", f"**{target['nickname']}**").replace('🎁', gift['gift_emoji']))).guild
+        log_channel = self.bot.get_channel(self.bot.config.get("present_log"))
+
+        await log_channel.send(log_message.format(f"**{user['nickname']}**", f"**{target['nickname']}**").replace('🎁', gift['gift_emoji']))
         
         # Check if the user reached the gifts sent/received thresholds
+        guild = log_channel.guild
         guild_member = guild.get_member(member.id) or await guild.fetch_member(member.id)
         giveRole = False
         roleToCheck = None
     
         for role_params in rewards["roles_list"]:
-            
             if (user['gifts_sent'] >= role_params["nbSent"] and user['gifts_received'] >= role_params["nbReceived"]):
                 giveRole = True
                 roleToCheck = role_params["roleId"]
 
-        # Stop if no new threshold is met
-        if not giveRole:
-            return
+        if not giveRole:  return # Stop if no new threshold is met
         
         # Stop if the user already has the given role (to prevent adding the same role multiple times on a member)
         for role in guild_member.roles:
@@ -263,6 +266,7 @@ class GiftDrop(commands.Cog):
             await guild_member.add_roles(role, reason=f"Reached {user['gifts_sent']} gifts sent reward.")
         except discord.HTTPException:
             self.bot.logger.exception(f"Failed to add reward role for {user['gifts_sent']} gifts sent to {member!r}.")
+
     @commands.cooldown(1, 4, commands.BucketType.user)
     @commands.cooldown(1, 1.5, commands.BucketType.channel)
     @commands.command("check")
