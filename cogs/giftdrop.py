@@ -2,8 +2,10 @@
 import asyncio
 from asyncpg.exceptions import UniqueViolationError 
 import random
-from datetime import datetime
-
+from datetime import datetime,timedelta
+import numpy as np
+import io
+import math
 import discord
 from discord.ext import commands
 
@@ -23,9 +25,17 @@ class GiftDrop(commands.Cog):
         self.bot = bot
         self.acquire_lock = asyncio.Lock()
         self.current_gifters = []
+        self.present_stash = []
+        self.label_stash = []
+        self.log_stash = []
+        
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
+
+        
+        if message.content.startswith("."):
+            return  # do not drop gifts on commands
 
         immediate_time = datetime.utcnow()
         if message.author.id in self.current_gifters and not message.guild:
@@ -45,11 +55,10 @@ class GiftDrop(commands.Cog):
                     self.bot.loop.create_task(self.add_score(message.author, message.created_at))
                     self.bot.logger.info(f"User {message.author.id} guessed gift ({gift['nickname']}) in "
                                      f"{(immediate_time - last_gift).total_seconds()} seconds.")
+                else:
+                    await message.add_reaction('<:redtick:567088349484023818>')
             return
 
-
-        if message.content.startswith("."):
-            return  # do not drop gifts on commands
 
         if message.channel.id not in self.bot.config.get("drop_channels", []):
             return
@@ -68,11 +77,10 @@ class GiftDrop(commands.Cog):
                         self.bot.loop.create_task(self.create_gift(message.author, message.created_at))
 
     async def perform_natural_drop(self, user, secret_member, first_attempt, gift_icon_index):
-    
         secret_string = secret_string_wrapper(secret_member)
 
         embed = discord.Embed(
-            title='New Gift!' if first_attempt else 'Try Again!',
+            title='New Gift!' if first_attempt else 'Another Hint!',
             description='Type the name of the finished label to send the gift!' if first_attempt else 'You have another chance. Type the name of \nthe finished label to send the gift!',
             color=0xff0000 if first_attempt else 0xff8500
         )
@@ -105,13 +113,33 @@ class GiftDrop(commands.Cog):
                 gift_icon_index = ret_value['gift_icon']
                 secret_member_obj = ret_value
             else:
-                ret_value = await conn.fetch("SELECT nickname, user_id FROM user_data WHERE user_id != $1", member.id)
+                # Due to label stash, you can't currently take yourself out of the label pool
+                # ret_value = await conn.fetch("SELECT nickname, user_id FROM user_data WHERE user_id != $1", member.id)
+                ret_value = await conn.fetch("SELECT nickname, user_id FROM user_data")
                 secret_members = [x for x in ret_value]
-                gift_icon_index = random.randint(0, len(self.bot.config.get('gift_icons'))-1)
+                last_stashed = None
+                if len(self.present_stash) == 1:
+                    last_stashed = self.present_stash.pop()
+                if len(self.present_stash) == 0 or random.randint(0,100) < 5:
+                    self.present_stash = [x for x in range(len(self.bot.config.get('gift_icons')))]
+                    if last_stashed:
+                        self.present_stash.pop(last_stashed)
+                    
+                gift_icon_index = last_stashed or self.present_stash.pop(random.choice([x for x in range(len(self.present_stash))]))
                 if not secret_members:
                     self.bot.logger.error(f"I wanted to drop a gift, but I couldn't find any members to send to!")
                     return
-                secret_member_obj = random.choice(secret_members)
+                
+                last_stashed = None
+                if len(self.label_stash) == 1:
+                    last_stashed = self.label_stash.pop()
+                    
+                if len(self.label_stash) == 0:
+                    self.label_stash = [x for x in range(len(secret_members))]
+                    if last_stashed:
+                        self.label_stash.pop(last_stashed)
+                
+                secret_member_obj = secret_members[last_stashed or self.label_stash.pop(random.choice([x for x in range(len(self.label_stash))]))]
 
             secret_member = secret_member_obj['nickname']
             target_user_id = secret_member_obj['user_id']
@@ -190,45 +218,55 @@ class GiftDrop(commands.Cog):
 
     async def add_score(self, member, when):
         gift, user, target = await self._add_score(member.id, when)
+
         embed = discord.Embed(
-            description=f"**TO:** {target['nickname']}\n**FROM:** {user['nickname']}",
+            description=f"**TO:** {target['nickname']}\n**FROM:** {user['nickname']}\n[← Back to chat](https://canary.discord.com/channels/272885620769161216/{self.bot.config.get('drop_channels')[0]}/)",
             color=0x69e0a5)
         embed.set_thumbnail(url=target['avatar_url'])
         embed.set_author(name="Gift Sent!", icon_url=gift['gift_icon'])
         embed.set_footer(text=f"Total Gifts Sent: {user['gifts_sent']}")
         await member.send(embed=embed)
+
         rewards = self.bot.config.get('reward_roles', {})
-        await self.bot.get_channel(778410033926897685).send(random.choice(giftstrings).format(f"**{user['nickname']}**", f"**{target['nickname']}**").replace('🎁', gift['gift_emoji']))
+
+        if len(self.log_stash) <= 1 or random.randint(0,100) < 3:
+            self.log_stash = [x for x in range(len(giftstrings))]
+
+        log_message = giftstrings[self.log_stash.pop(random.choice([x for x in range(len(self.log_stash))]))]
+        log_channel = self.bot.get_channel(self.bot.config.get("present_log"))
+
+        await log_channel.send(log_message.format(f"**{user['nickname']}**", f"**{target['nickname']}**").replace('🎁', gift['gift_emoji']))
         
         # Check if the user reached the gifts sent/received thresholds
+        guild = log_channel.guild
+        guild_member = guild.get_member(member.id) or await guild.fetch_member(member.id)
         giveRole = False
         roleToCheck = None
-        # TO-DO: Fix. This is checking roles in dm and not guild. Does not account for the case when the gift's recieved goes over the required before this check happens
+    
         for role_params in rewards["roles_list"]:
-            if (user['gifts_sent'] == role_params["nbSent"] and user['gifts_received'] >= role_params["nbReceived"]) or (user['gifts_sent'] >= role_params["nbSent"] and user['gifts_received'] == role_params["nbReceived"]):
+            if (user['gifts_sent'] >= role_params["nbSent"] and user['gifts_received'] >= role_params["nbReceived"]):
                 giveRole = True
                 roleToCheck = role_params["roleId"]
 
-        # Stop if no new threshold is met
-        if not giveRole:
-            return
+        if not giveRole:  return # Stop if no new threshold is met
         
         # Stop if the user already has the given role (to prevent adding the same role multiple times on a member)
-        for role in member.roles:
+        for role in guild_member.roles:
             if role.id == roleToCheck:
                 return
 
         # Add the role to the user
-        role = roleToCheck
+        role = guild.get_role(roleToCheck)
 
         if role is None:
             self.bot.logger.warning(f"Failed to find reward role for {user['gifts_sent']} gifts sent.")
             return
 
         try:
-            await member.add_roles(role, reason=f"Reached {user['gifts_sent']} gifts sent reward.")
+            await guild_member.add_roles(role, reason=f"Reached {user['gifts_sent']} gifts sent reward.")
         except discord.HTTPException:
             self.bot.logger.exception(f"Failed to add reward role for {user['gifts_sent']} gifts sent to {member!r}.")
+
     @commands.cooldown(1, 4, commands.BucketType.user)
     @commands.cooldown(1, 1.5, commands.BucketType.channel)
     @commands.command("check")
@@ -356,7 +394,7 @@ class GiftDrop(commands.Cog):
     @commands.check(utils.check_granted_server)
     @commands.command("change_nickname")
     async def change_nickname_command(self, ctx: commands.Context, target: discord.Member, nickname: str=''):
-        """Check another user's gifts"""
+        """Change another user's nickname"""
         if not self.bot.db_available.is_set():
             return
 
@@ -472,56 +510,68 @@ class GiftDrop(commands.Cog):
                 await conn.execute("DELETE FROM user_data WHERE user_id = $1", ctx.author.id)
 
             await ctx.send(f"Cleared entry for {ctx.author.id}")
-    # Testing purposes only
-    # DELETE LATER
-    @commands.check(utils.check_granted_server)
-    @commands.command("add_dummy")
-    async def add_dummy(self, ctx: commands.Context, nickname: str=''):
-        results = test_username(nickname, ctx)
-        if len(results) > 0:
-            joined = ',\n'.join(results)
-            await ctx.send(f"{ctx.author.mention}, {joined}")
-            return
-        async with self.bot.db.acquire() as conn:
-            async with conn.transaction():
-                ret_value = await conn.fetchval(
-                    """
-                    INSERT INTO user_data (user_id, nickname)
-                    VALUES ($1, $2)
-                    ON CONFLICT (nickname) DO UPDATE
-                    SET nickname = $3
-                    RETURNING nickname
-                    """,
-                    random.randint(0, 10000),
-                    nickname if nickname != '' else f"Dummy{random.randint(0, 100000)}",
-                    f"Dummy{random.randint(0, 100000)}",  ## TO-DO change this to something more visually pleasant
-                )
-                await ctx.send(f"Dummy has joined the Blob Santa Event as **{ret_value}**!")
-    # Testing purposes only
-    # DELETE LATER
-    @commands.check(utils.check_granted_server)
-    @commands.command("delete_dummies")
-    async def reset(self, ctx: commands.Context):
-        if not self.bot.db_available.is_set():
-            await ctx.send("No connection to database.")
-            return
-
-        async with self.bot.db.acquire() as conn:
-            async with conn.transaction():
-                await conn.execute("DELETE FROM user_data WHERE user_id <= 10000")
-            await ctx.send(f"Cleared entry for dummies")
     
     @commands.has_permissions(ban_members=True)
     @commands.check(utils.check_granted_server)
+    @commands.command("extract_data")
+    async def extract_data_command(self, ctx: commands.Context, mode: str='', n_bins: int=100):
+        """Timeseries csv file for data visualization"""
+        if not self.bot.db_available.is_set():
+            await ctx.send("No connection to database.")
+            return
+        
+        async with self.bot.db.acquire() as conn:
+            record = await conn.fetchrow("SELECT MIN(activated_date) as min_date, MAX(activated_date) as max_date FROM gifts")
+            seconds = math.ceil((record['max_date']-record['min_date']).total_seconds()/(n_bins-1))
+            bins = [(record['min_date'] + timedelta(seconds=seconds*i)) for i in range(n_bins)]
+            features = ['name', 'pic'] + [x.strftime('%m/%d %H:%M') for x in bins]
+            data = []
+            data.append(features)
+            if mode in ['', 'users']:
+                users = await conn.fetch("SELECT user_id,nickname FROM user_data")
+                for user in users:
+                    dates = np.array([np.datetime64(date['activated_date']) for date in await conn.fetch("SELECT activated_date FROM gifts WHERE user_id = $1 AND is_sent = TRUE", user['user_id'])]).view('i8')
+
+                    inds = list(np.digitize(dates, np.array(bins, dtype='datetime64').view('i8')))
+                    row = [user['nickname'], str((await self.bot.fetch_user(user['user_id'])).avatar_url_as(format='png', static_format='png', size=128))] + [0 for x in range(len(bins))]
+                    count = 0
+                    for i in range(len(row)-2):
+                        for ind in inds:
+                            if ind == i:
+                                count += 1
+                        row[i+2] = count
+                        
+                    data.append(row)
+            elif mode == 'presents':
+                presents = [x for x in range(len(self.bot.config.get('gift_icons')))]
+                for present in presents:
+                    dates = np.array([np.datetime64(date['activated_date']) for date in await conn.fetch("SELECT activated_date FROM gifts WHERE gift_icon = $1 AND is_sent = TRUE", present)]).view('i8')
+
+                    inds = list(np.digitize(dates, np.array(bins, dtype='datetime64').view('i8')))
+                    row = [present, self.bot.config.get('gift_icons')[present]] + [0 for x in range(len(bins))]
+                    count = 0
+                    for i in range(len(row)-2):
+                        for ind in inds:
+                            if ind == i:
+                                count += 1
+                        row[i+2] = count
+                        
+                    data.append(row)
+            text = "\n".join(','.join([str(s) for s in x]) for x in data)
+            await ctx.send(file=discord.File(filename="stats.csv", fp=io.BytesIO(text.encode("utf8"))))
+
+
+
+    @commands.has_permissions(ban_members=True)
+    @commands.check(utils.check_granted_server)
     @commands.command("reset_user")
-    async def reset_user(self, ctx: commands.Context, user_id: str=''):
+    async def reset_user_command(self, ctx: commands.Context, *, target: discord.Member):
         """Reset users' accounts"""
         if not self.bot.db_available.is_set():
             await ctx.send("No connection to database.")
             return
-        user_id = int(user_id)
         async with self.bot.db.acquire() as conn:
-            record = await conn.fetchrow("SELECT * FROM user_data WHERE user_id = $1", user_id)
+            record = await conn.fetchrow("SELECT * FROM user_data WHERE user_id = $1", target.id)
             if record is None:
                 await ctx.send("This user doesn't have a database entry.")
                 return
@@ -537,7 +587,7 @@ class GiftDrop(commands.Cog):
             try:
                 validate_message = await self.bot.wait_for('message', check=wait_check, timeout=30)
             except asyncio.TimeoutError:
-                await ctx.send(f"Timed out request to reset {user_id}.")
+                await ctx.send(f"Timed out request to reset {target.id}.")
                 return
             else:
                 if validate_message.content.lower() == 'cancel':
@@ -545,9 +595,9 @@ class GiftDrop(commands.Cog):
                     return
 
                 async with conn.transaction():
-                    await conn.execute("DELETE FROM user_data WHERE user_id = $1", user_id)
+                    await conn.execute("DELETE FROM user_data WHERE user_id = $1", target.id)
 
-                await ctx.send(f"Cleared entry for {user_id}")
+                await ctx.send(f"Cleared entry for {target.id}")
 
 def setup(bot):
     bot.add_cog(GiftDrop(bot))
