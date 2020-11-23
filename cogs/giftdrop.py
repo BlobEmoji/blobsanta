@@ -116,16 +116,16 @@ class GiftDrop(commands.Cog):
                 # Due to label stash, you can't currently take yourself out of the label pool
                 # ret_value = await conn.fetch("SELECT nickname, user_id FROM user_data WHERE user_id != $1", member.id)
                 ret_value = await conn.fetch("SELECT nickname, user_id FROM user_data")
-                secret_members = [x for x in ret_value]
+                secret_members = ret_value.copy()
                 last_stashed = None
                 if len(self.present_stash) == 1:
                     last_stashed = self.present_stash.pop()
                 if len(self.present_stash) == 0 or random.randint(0,100) < 5:
-                    self.present_stash = [x for x in range(len(self.bot.config.get('gift_icons')))]
+                    self.present_stash = [*range(len(self.bot.config.get('gift_icons')))]
                     if last_stashed:
                         self.present_stash.pop(last_stashed)
                     
-                gift_icon_index = last_stashed or self.present_stash.pop(random.choice([x for x in range(len(self.present_stash))]))
+                gift_icon_index = last_stashed or self.present_stash.pop(random.randrange(len(self.present_stash)))
                 if not secret_members:
                     self.bot.logger.error(f"I wanted to drop a gift, but I couldn't find any members to send to!")
                     return
@@ -135,11 +135,11 @@ class GiftDrop(commands.Cog):
                     last_stashed = self.label_stash.pop()
                     
                 if len(self.label_stash) == 0:
-                    self.label_stash = [x for x in range(len(secret_members))]
+                    self.label_stash = [*range(len(secret_members))]
                     if last_stashed:
                         self.label_stash.pop(last_stashed)
                 
-                secret_member_obj = secret_members[last_stashed or self.label_stash.pop(random.choice([x for x in range(len(self.label_stash))]))]
+                secret_member_obj = secret_members[last_stashed or self.label_stash.pop(random.randrange(len(self.label_stash)))]
 
             secret_member = secret_member_obj['nickname']
             target_user_id = secret_member_obj['user_id']
@@ -230,9 +230,9 @@ class GiftDrop(commands.Cog):
         rewards = self.bot.config.get('reward_roles', {})
 
         if len(self.log_stash) <= 1 or random.randint(0,100) < 3:
-            self.log_stash = [x for x in range(len(giftstrings))]
+            self.log_stash = [*range(len(giftstrings))]
 
-        log_message = giftstrings[self.log_stash.pop(random.choice([x for x in range(len(self.log_stash))]))]
+        log_message = giftstrings[self.log_stash.pop(random.randrange(len(self.log_stash)))]
         log_channel = self.bot.get_channel(self.bot.config.get("present_log"))
 
         await log_channel.send(log_message.format(f"**{user['nickname']}**", f"**{target['nickname']}**").replace('🎁', gift['gift_emoji']))
@@ -533,7 +533,7 @@ class GiftDrop(commands.Cog):
                     dates = np.array([np.datetime64(date['activated_date']) for date in await conn.fetch("SELECT activated_date FROM gifts WHERE user_id = $1 AND is_sent = TRUE", user['user_id'])]).view('i8')
 
                     inds = list(np.digitize(dates, np.array(bins, dtype='datetime64').view('i8')))
-                    row = [user['nickname'], str((await self.bot.fetch_user(user['user_id'])).avatar_url_as(format='png', static_format='png', size=128))] + [0 for x in range(len(bins))]
+                    row = [user['nickname'], str((await self.bot.fetch_user(user['user_id'])).avatar_url_as(format='png', static_format='png', size=128))] + [0] * len(bins)
                     count = 0
                     for i in range(len(row)-2):
                         for ind in inds:
@@ -543,12 +543,12 @@ class GiftDrop(commands.Cog):
                         
                     data.append(row)
             elif mode == 'presents':
-                presents = [x for x in range(len(self.bot.config.get('gift_icons')))]
+                presents = [*range(len(self.bot.config.get('gift_icons')))]
                 for present in presents:
                     dates = np.array([np.datetime64(date['activated_date']) for date in await conn.fetch("SELECT activated_date FROM gifts WHERE gift_icon = $1 AND is_sent = TRUE", present)]).view('i8')
 
                     inds = list(np.digitize(dates, np.array(bins, dtype='datetime64').view('i8')))
-                    row = [present, self.bot.config.get('gift_icons')[present]] + [0 for x in range(len(bins))]
+                    row = [present, self.bot.config.get('gift_icons')[present]] + [0] * len(bins)
                     count = 0
                     for i in range(len(row)-2):
                         for ind in inds:
