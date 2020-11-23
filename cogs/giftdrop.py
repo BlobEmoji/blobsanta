@@ -5,6 +5,7 @@ import random
 from datetime import datetime,timedelta
 import numpy as np
 import io
+import math
 import discord
 from discord.ext import commands
 
@@ -113,19 +114,33 @@ class GiftDrop(commands.Cog):
                 gift_icon_index = ret_value['gift_icon']
                 secret_member_obj = ret_value
             else:
-                ret_value = await conn.fetch("SELECT nickname, user_id FROM user_data WHERE user_id != $1", member.id)
+                # Due to label stash, you can't currently take yourself out of the label pool
+                # ret_value = await conn.fetch("SELECT nickname, user_id FROM user_data WHERE user_id != $1", member.id)
+                ret_value = await conn.fetch("SELECT nickname, user_id FROM user_data")
                 secret_members = [x for x in ret_value]
-                if len(self.present_stash) <= 1 or random.randint(0,100) < 5:
+                last_stashed = None
+                if len(self.present_stash) == 1:
+                    last_stashed = self.present_stash.pop()
+                if len(self.present_stash) == 0 or random.randint(0,100) < 5:
                     self.present_stash = [x for x in range(len(self.bot.config.get('gift_icons')))]
-
-                gift_icon_index = self.present_stash.pop(random.choice([x for x in range(len(self.present_stash))]))
+                    if last_stashed:
+                        self.present_stash.pop(last_stashed)
+                    
+                gift_icon_index = last_stashed or self.present_stash.pop(random.choice([x for x in range(len(self.present_stash))]))
                 if not secret_members:
                     self.bot.logger.error(f"I wanted to drop a gift, but I couldn't find any members to send to!")
                     return
-                if len(self.label_stash) <= 1 or random.randint(0,100) < 5:
-                    self.label_stash = [x for x in range(len(secret_members))]
                 
-                secret_member_obj = secret_members[self.label_stash.pop(random.choice([x for x in range(len(self.label_stash))]))]
+                last_stashed = None
+                if len(self.label_stash) == 1:
+                    last_stashed = self.label_stash.pop()
+                    
+                if len(self.label_stash) == 0:
+                    self.label_stash = [x for x in range(len(secret_members))]
+                    if last_stashed:
+                        self.label_stash.pop(last_stashed)
+                
+                secret_member_obj = secret_members[last_stashed or self.label_stash.pop(random.choice([x for x in range(len(self.label_stash))]))]
 
             secret_member = secret_member_obj['nickname']
             target_user_id = secret_member_obj['user_id']
@@ -205,7 +220,7 @@ class GiftDrop(commands.Cog):
     async def add_score(self, member, when):
         gift, user, target = await self._add_score(member.id, when)
         embed = discord.Embed(
-            description=f"**TO:** {target['nickname']}\n**FROM:** {user['nickname']}",
+            description=f"**TO:** {target['nickname']}\n**FROM:** {user['nickname']}\n[← Back to chat](https://canary.discord.com/channels/272885620769161216/{self.bot.config.get('drop_channels')[0]}/)",
             color=0x69e0a5)
         embed.set_thumbnail(url=target['avatar_url'])
         embed.set_author(name="Gift Sent!", icon_url=gift['gift_icon'])
@@ -503,8 +518,8 @@ class GiftDrop(commands.Cog):
         
         async with self.bot.db.acquire() as conn:
             record = await conn.fetchrow("SELECT MIN(activated_date) as min_date, MAX(activated_date) as max_date FROM gifts")
-            minutes = int((record['max_date']-record['min_date']).total_seconds()/60/n_bins)
-            bins = [(record['min_date'] + timedelta(minutes=minutes*i)) for i in range(n_bins)]
+            seconds = math.ceil((record['max_date']-record['min_date']).total_seconds()/(n_bins-1))
+            bins = [(record['min_date'] + timedelta(seconds=seconds*i)) for i in range(n_bins)]
             features = ['name', 'pic'] + [x.strftime('%m/%d %H:%M') for x in bins]
             data = []
             data.append(features)
