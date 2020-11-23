@@ -24,6 +24,10 @@ class GiftDrop(commands.Cog):
         self.bot = bot
         self.acquire_lock = asyncio.Lock()
         self.current_gifters = []
+        self.present_stash = []
+        self.label_stash = []
+        self.log_stash = []
+        
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
@@ -111,11 +115,17 @@ class GiftDrop(commands.Cog):
             else:
                 ret_value = await conn.fetch("SELECT nickname, user_id FROM user_data WHERE user_id != $1", member.id)
                 secret_members = [x for x in ret_value]
-                gift_icon_index = random.randint(0, len(self.bot.config.get('gift_icons'))-1)
+                if len(self.present_stash) <= 1 or random.randint(0,100) < 5:
+                    self.present_stash = [x for x in range(len(self.bot.config.get('gift_icons')))]
+
+                gift_icon_index = self.present_stash.pop(random.choice([x for x in range(len(self.present_stash))]))
                 if not secret_members:
                     self.bot.logger.error(f"I wanted to drop a gift, but I couldn't find any members to send to!")
                     return
-                secret_member_obj = random.choice(secret_members)
+                if len(self.label_stash) <= 1 or random.randint(0,100) < 5:
+                    self.label_stash = [x for x in range(len(secret_members))]
+                
+                secret_member_obj = secret_members[self.label_stash.pop(random.choice([x for x in range(len(self.label_stash))]))]
 
             secret_member = secret_member_obj['nickname']
             target_user_id = secret_member_obj['user_id']
@@ -202,7 +212,10 @@ class GiftDrop(commands.Cog):
         embed.set_footer(text=f"Total Gifts Sent: {user['gifts_sent']}")
         await member.send(embed=embed)
         rewards = self.bot.config.get('reward_roles', {})
-        guild = (await self.bot.get_channel(778410033926897685).send(random.choice(giftstrings).format(f"**{user['nickname']}**", f"**{target['nickname']}**").replace('🎁', gift['gift_emoji']))).guild
+        if len(self.log_stash) <= 1 or random.randint(0,100) < 3:
+            self.log_stash = [x for x in range(len(giftstrings))]
+        log_message = giftstrings[self.log_stash.pop(random.choice([x for x in range(len(self.log_stash))]))]
+        guild = (await self.bot.get_channel(778410033926897685).send(log_message.format(f"**{user['nickname']}**", f"**{target['nickname']}**").replace('🎁', gift['gift_emoji']))).guild
         
         # Check if the user reached the gifts sent/received thresholds
         guild_member = guild.get_member(member.id) or await guild.fetch_member(member.id)
