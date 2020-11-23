@@ -74,5 +74,11 @@ giftstrings = [ # Gift emoji will be prefixed to these strings.
   "{0} just sent a 🌝 Moon to {1}. It crashes on Earth and {1} fails to stop it.",
   "{0} just sent <:stairs:779924876286623784> Stairs to {1}. {0} warned them about the stairs but {1} fell down on them. It keeps happening.",
   "{0} just sent a 📺 Television to {1}. It just keeps saying \"But wait, there's more!\".",
-  "{0} just sent a 💾 Floppy Disk to {1}. Don't copy that floppy!"
+  "{0} just sent a 💾 Floppy Disk to {1}. Don't copy that floppy!",
+  "{0} just sent a <:bolb:453933426555486208> Bolb to {1}. Bolb is silly, Bolb is lovely, Bolb is simply Bolb.",
+  "{0} just sent a <:googlebee:612122990338899995> Bee. According to all laws of gift distribution, a bee shouldn't be a gift.",
+  "{0} just sent a <:greentick:567088336166977536> Green Tick to {1}. <:greentick:567088336166977536> moved to <#289847856033169409>: {1} (by {0})",
+  "{0} just sent a 🎁 Gift to {1}. Inside the gift that was inside another gift, there's nothing.",
+  "{0} just sent a <:redtick:567088349484023818> Red Tick to {1}, It represents the denial from {1}.",
+  "{0} just sent a 🔮 Crystal Ball to {1}. The future has been revealed to {1}."
 ]
