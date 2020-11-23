@@ -110,7 +110,7 @@ class GiftDrop(commands.Cog):
                 gift_icon_index = ret_value['gift_icon']
                 secret_member_obj = ret_value
             else:
-                ret_value = await conn.fetch("SELECT nickname, user_id FROM user_data")
+                ret_value = await conn.fetch("SELECT nickname, user_id FROM user_data ORDER BY creation_date ASC")
                 secret_members = ret_value.copy()
                 last_stashed = None
                 if len(self.present_stash) == 1:
@@ -125,20 +125,22 @@ class GiftDrop(commands.Cog):
                     self.bot.logger.error(f"I wanted to drop a gift, but I couldn't find any members to send to!")
                     return
                 available_members = [i for i, s in enumerate (self.label_stash) if secret_members[s]['user_id'] != member.id]
+
+                self.bot.logger.info(f"Available Members: {[secret_members[self.label_stash[i]]['nickname'] for i in available_members]}")
                 if len(available_members) == 0:
                     self.label_stash = [*range(len(secret_members))]
                     available_members = [i for i, s in enumerate (self.label_stash) if secret_members[s]['user_id'] != member.id]
+
                 last_stashed = None
                 if len(self.label_stash) == 1 and len(available_members) == 1:
                     last_stashed = self.label_stash.pop(available_members[0]) 
-                
+
                 if len(self.label_stash) == 0:
                     self.label_stash = [*range(len(secret_members))]
                     if last_stashed:
                         self.label_stash.pop(available_members[0])
-
                 secret_member_obj = secret_members[last_stashed or self.label_stash.pop(random.choice(available_members))]
-
+                
             secret_member = secret_member_obj['nickname']
             target_user_id = secret_member_obj['user_id']
 
