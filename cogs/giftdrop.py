@@ -75,10 +75,8 @@ class GiftDrop(commands.Cog):
     async def perform_natural_drop(self, user, secret_member, first_attempt, gift_icon_index):
         secret_string = secret_string_wrapper(secret_member)
 
-        if first_attempt:
-            description = 'Type the name of the finished label to send the gift!'
-        else:
-            description = 'You have another chance. Type the name of \nthe finished label to send the gift!'
+        if first_attempt: description = 'Type the name of the finished label to send the gift!'
+        else: description = 'You have another chance. Type the name of \nthe finished label to send the gift!'
 
         embed = discord.Embed(
             title='New Gift!' if first_attempt else 'Another Hint!',
@@ -228,7 +226,7 @@ class GiftDrop(commands.Cog):
             return_id = self.bot.config.get('drop_channels')[0]
 
         return_link = f'[← Back to {return_name}](https://discord.com/channels/{guild.id}/{return_id}/)'
-        description = f'**TO:** {target['nickname']}\n**FROM:** {user['nickname']}\n{return_link}'
+        description = f"**TO:** {target['nickname']}\n**FROM:** {user['nickname']}\n{return_link}"
         embed = discord.Embed(description=description, color=0x69e0a5)
 
         embed.set_thumbnail(url=target['avatar_url'])
