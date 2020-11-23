@@ -10,7 +10,7 @@ import numpy as np
 from asyncpg.exceptions import UniqueViolationError
 from discord.ext import commands
 
-from db_stuff import fetch_gift_nickname, last_gift_from_db, check_has_gift, check_is_in
+from db_utils import fetch_gift_nickname, last_gift_from_db, check_has_gift, check_is_in
 from giftstrings import giftstrings
 from tools import test_username, secret_string_wrapper
 from . import utils
