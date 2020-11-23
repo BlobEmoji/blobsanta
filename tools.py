@@ -23,18 +23,6 @@ def test_username(nickname: str, ctx: commands.Context) -> list:
     return errors
 
 
-async def check_has_gift(db, author_id: int) -> bool:
-    async with db.acquire() as conn:
-        check = await conn.fetchval("""
-        SELECT EXISTS (
-        SELECT 1
-        FROM gifts
-        WHERE active = TRUE and user_id = $1
-        )
-        """, author_id)
-    return check
-
-
 def secret_substring(name: str) -> str:
     length = random.randint(3, 4)
     start = random.randint(0, len(name) - length)
