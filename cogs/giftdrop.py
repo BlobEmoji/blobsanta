@@ -28,14 +28,13 @@ class GiftDrop(commands.Cog):
         self.present_stash = []
         self.label_stash = []
         self.log_stash = []
+        self.users_last_channel = {}
         
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
 
-        
-        if message.content.startswith("."):
-            return  # do not drop gifts on commands
+        if message.content.startswith("."): return  # do not drop gifts on commands
 
         immediate_time = datetime.utcnow()
         if message.author.id in self.current_gifters and not message.guild:
@@ -60,8 +59,8 @@ class GiftDrop(commands.Cog):
             return
 
 
-        if message.channel.id not in self.bot.config.get("drop_channels", []):
-            return
+        if message.channel.id not in self.bot.config.get("drop_channels", []): return
+        self.users_last_channel[message.author.id] = {'name': message.channel.name, 'id': message.channel.id}
 
         # Ignore messages that are more likely to be spammy
         if len(message.content) < 5:
@@ -218,10 +217,19 @@ class GiftDrop(commands.Cog):
 
     async def add_score(self, member, when):
         gift, user, target = await self._add_score(member.id, when)
+        log_channel = self.bot.get_channel(self.bot.config.get("present_log"))
+        guild = log_channel.guild
 
-        embed = discord.Embed(
-            description=f"**TO:** {target['nickname']}\n**FROM:** {user['nickname']}\n[← Back to chat](https://canary.discord.com/channels/272885620769161216/{self.bot.config.get('drop_channels')[0]}/)",
-            color=0x69e0a5)
+        if member.id in self.users_last_channel: 
+            return_name = f"#{self.users_last_channel[member.id]['name']}"
+            return_id = self.users_last_channel[member.id]['id']
+        else:
+            return_name = 'chat'
+            return_id = self.bot.config.get('drop_channels')[0]
+
+        return_link = f'[← Back to {return_name}](https://discord.com/channels/{guild.id}/{return_id}/)'
+
+        embed = discord.Embed(description=f"**TO:** {target['nickname']}\n**FROM:** {user['nickname']}\n{return_link}", color=0x69e0a5)
         embed.set_thumbnail(url=target['avatar_url'])
         embed.set_author(name="Gift Sent!", icon_url=gift['gift_icon'])
         embed.set_footer(text=f"Total Gifts Sent: {user['gifts_sent']}")
@@ -233,12 +241,9 @@ class GiftDrop(commands.Cog):
             self.log_stash = [*range(len(giftstrings))]
 
         log_message = f'{gift["gift_emoji"]} {giftstrings[self.log_stash.pop(random.randrange(len(self.log_stash)))]}' 
-        log_channel = self.bot.get_channel(self.bot.config.get("present_log"))
-
         await log_channel.send(log_message.format(f"**{user['nickname']}**", f"**{target['nickname']}**"))
         
         # Check if the user reached the gifts sent/received thresholds
-        guild = log_channel.guild
         guild_member = guild.get_member(member.id) or await guild.fetch_member(member.id)
         giveRole = False
         roleToCheck = None
