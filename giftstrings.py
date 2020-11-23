@@ -81,4 +81,16 @@ giftstrings = [ # Gift emoji will be prefixed to these strings.
   "{0} just sent a 🎁 Gift to {1}. Inside the gift that was inside another gift, there's nothing.",
   "{0} just sent a <:redtick:567088349484023818> Red Tick to {1}. {1} isn't being added as an emoji today.",
   "{0} just sent a 🔮 Crystal Ball to {1}. The future has been revealed to {1}."
+  "{0} gave a 👾 Space Invader to {1}. {1} is doomed, DOOMED!"
+  "{0} gave a ♟️️Pawn to {1}. Checkmate!"
+  "{0} gave a 🥧️ Pie to {1}. I wonder if it can tell the time..."
+  "{0} just sent a 🐉 Dragon to {1}. King Dragon sends his regards."
+  "{0} just sent a 🪕 Banjo to {1}. Hey, where's Kazooie?"
+  "{0} just sent a 🥏 Frisbee to {1}. TWO POINTS!"
+  "{0} just sent a 🥮 Moon Cake to {1}. What a time to be alive."
+  "{0} sent a 🚌 Bus to {1}. Hope that {1} likes to party!"
+  "{0} sent a 🍕 Pizza to {1}.  Little-known fact: vampires are weak to it."
+  "{0} sent a 🐺 Wolf to {1}.  One down, thirteen to go."
+  "{0} sent a 🪣 Bucket to {1}.  There's more."
+  "{0} sent a 🍙 Donut to {1}.  I hope it's jelly-filled!"
 ]
