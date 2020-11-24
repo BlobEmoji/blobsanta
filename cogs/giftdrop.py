@@ -413,7 +413,7 @@ class GiftDrop(commands.Cog):
             return
 
         async with self.bot.db.acquire() as conn:
-            if not check_is_in(conn, target.id):
+            if not await check_is_in(conn, target.id):
                 await ctx.send(
                     f"{ctx.author.mention} Hey, {target.mention} doesn't seem to be participating currently."
                 )
