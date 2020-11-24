@@ -92,5 +92,6 @@ giftstrings = [ # Gift emoji will be prefixed to these strings.
   "{0} just sent a 🍕 Pizza to {1}. Little-known fact: vampires are weak to it.",
   "{0} just sent a 🐺 Wolf to {1}. One down, thirteen to go.",
   "{0} just sent a 🪣 Bucket to {1}. There's more.",
-  "{0} just sent a 🍙 Donut to {1}. I hope it's jelly-filled!"
+  "{0} just sent a 🍙 Donut to {1}. I hope it's jelly-filled!",
+  "{0} just sent a <:bluedress:780590769924866049> Dress to {1}. Is it blue and black or white and gold?"
 ]
