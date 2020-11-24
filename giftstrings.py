@@ -80,5 +80,17 @@ giftstrings = [ # Gift emoji will be prefixed to these strings.
   "{0} just sent a <:greentick:567088336166977536> Green Tick to {1}. <:greentick:567088336166977536> moved to <#289847856033169409>: {1} (by {0})",
   "{0} just sent a 🎁 Gift to {1}. Inside the gift that was inside another gift, there's nothing.",
   "{0} just sent a <:redtick:567088349484023818> Red Tick to {1}. {1} isn't being added as an emoji today.",
-  "{0} just sent a 🔮 Crystal Ball to {1}. The future has been revealed to {1}."
+  "{0} just sent a 🔮 Crystal Ball to {1}. The future has been revealed to {1}.",
+  "{0} just sent a 👾 Space Invader to {1}. {1} is doomed, DOOMED!",
+  "{0} just sent a ♟️️ Pawn to {1}. Checkmate!",
+  "{0} just sent a 🥧️ Pie to {1}. I wonder if it can tell the time...",
+  "{0} just sent a 🐉 Dragon to {1}. King Dragon sends his regards.",
+  "{0} just sent a 🪕 Banjo to {1}. Hey, where's Kazooie?",
+  "{0} just sent a 🥏 Frisbee to {1}. TWO POINTS!",
+  "{0} just sent a 🥮 Moon Cake to {1}. What a time to be alive.",
+  "{0} just sent a 🚌 Bus to {1}. Hope that {1} likes to party!",
+  "{0} just sent a 🍕 Pizza to {1}. Little-known fact: vampires are weak to it.",
+  "{0} just sent a 🐺 Wolf to {1}. One down, thirteen to go.",
+  "{0} just sent a 🪣 Bucket to {1}. There's more.",
+  "{0} just sent a 🍙 Donut to {1}. I hope it's jelly-filled!"
 ]
