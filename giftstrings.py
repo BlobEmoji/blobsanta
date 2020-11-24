@@ -89,8 +89,8 @@ giftstrings = [ # Gift emoji will be prefixed to these strings.
   "{0} just sent a 🥏 Frisbee to {1}. TWO POINTS!"
   "{0} just sent a 🥮 Moon Cake to {1}. What a time to be alive."
   "{0} just sent a 🚌 Bus to {1}. Hope that {1} likes to party!"
-  "{0} just sent a 🍕 Pizza to {1}.  Little-known fact: vampires are weak to it."
-  "{0} just sent a 🐺 Wolf to {1}.  One down, thirteen to go."
-  "{0} just sent a 🪣 Bucket to {1}.  There's more."
-  "{0} just sent a 🍙 Donut to {1}.  I hope it's jelly-filled!"
+  "{0} just sent a 🍕 Pizza to {1}. Little-known fact: vampires are weak to it."
+  "{0} just sent a 🐺 Wolf to {1}. One down, thirteen to go."
+  "{0} just sent a 🪣 Bucket to {1}. There's more."
+  "{0} just sent a 🍙 Donut to {1}. I hope it's jelly-filled!"
 ]
