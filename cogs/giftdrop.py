@@ -31,6 +31,7 @@ class GiftDrop(commands.Cog):
         self.present_stash = []
         self.label_stash = []
         self.log_stash = []
+        self.users_last_message = {}
         self.users_last_channel = {}
         self.last_label = None
 
@@ -64,14 +65,17 @@ class GiftDrop(commands.Cog):
         if len(message.content) < 5:
             return
         drop_chance = self.bot.config.get("drop_chance", 0.1)
-        if random.random() < drop_chance:
+        
+        
+        if (not message.author.id in self.users_last_message or (datetime.now()-self.users_last_message[message.author.id]).total_seconds() > self.bot.config.get("recovery_time", 10)) and random.random() < drop_chance:
+            self.users_last_message[message.author.id] = datetime.now()
             async with self.bot.db.acquire() as conn:
                 last_gift = await last_gift_from_db(conn, message.author.id)
                 if last_gift is not None:
                     if (datetime.utcnow() - last_gift).total_seconds() > self.bot.config.get("cooldown_time", 30):
                         self.bot.logger.info(f"A natural gift has dropped ({message.author.id})")
-
                         self.bot.loop.create_task(self.create_gift(message.author, message.created_at))
+
 
     async def perform_natural_drop(self, user, secret_member, first_attempt, gift_icon_index):
         secret_string = secret_string_wrapper(secret_member)
