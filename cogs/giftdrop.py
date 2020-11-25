@@ -29,7 +29,7 @@ class GiftDrop(commands.Cog):
         self.gift_lock = asyncio.Lock()
         self.current_gifters = []
         self.present_stash = []
-        self.label_stash = []
+        self.label_stash = {}
         self.log_stash = []
         self.users_last_message = {}
         self.users_last_channel = {}
@@ -95,89 +95,75 @@ class GiftDrop(commands.Cog):
         await user.send(embed=embed)
 
     async def create_gift(self, member, when):
-        async with self.gift_lock:
-            async with self.bot.db.acquire() as conn:
+        async with self.bot.db.acquire() as conn:
+            first_attempt = True
+            ret_value = await conn.fetchrow(
+                """
+                SELECT nickname, user_data.user_id, gift_icon
+                FROM gifts
+                INNER JOIN user_data
+                ON target_user_id = user_data.user_id
+                WHERE gifts.user_id = $1 AND active 
+                """,
+                member.id
+            )
+            if member.id not in self.current_gifters:
+                self.current_gifters.append(member.id)
+            if ret_value is not None:
+                first_attempt = False
+                gift_icon_index = ret_value['gift_icon']
+                secret_member_obj = ret_value
+            else:
+                secret_members = await conn.fetch("SELECT nickname, user_id FROM user_data ORDER BY creation_date ASC")
+                
+                last_stashed = None
+                if len(self.present_stash) == 1:
+                    last_stashed = self.present_stash.pop()
+                if len(self.present_stash) == 0 or random.randint(0,100) < 5:
+                    self.present_stash = [*range(len(self.bot.config.get('gift_icons')))]
+                    if last_stashed:
+                        self.present_stash.pop(last_stashed)
 
-                first_attempt = True
-                ret_value = await conn.fetchrow(
-                    """
-                    SELECT nickname, user_data.user_id, gift_icon
-                    FROM gifts
-                    INNER JOIN user_data
-                    ON target_user_id = user_data.user_id
-                    WHERE gifts.user_id = $1 AND active 
-                    """,
-                    member.id
-                )
-                if member.id not in self.current_gifters:
-                    self.current_gifters.append(member.id)
-                if ret_value is not None:
-                    first_attempt = False
-                    gift_icon_index = ret_value['gift_icon']
-                    secret_member_obj = ret_value
-                else:
-                    ret_value = await conn.fetch("SELECT nickname, user_id FROM user_data ORDER BY creation_date ASC")
-                    secret_members = ret_value.copy()
-                    last_stashed = None
-                    if len(self.present_stash) == 1:
-                        last_stashed = self.present_stash.pop()
-                    if len(self.present_stash) == 0 or random.randint(0,100) < 5:
-                        self.present_stash = [*range(len(self.bot.config.get('gift_icons')))]
-                        if last_stashed:
-                            self.present_stash.pop(last_stashed)
-
-                    gift_icon_index = last_stashed or self.present_stash.pop(random.randrange(len(self.present_stash)))
-                    if not secret_members:
-                        self.bot.logger.error(f"I wanted to drop a gift, but I couldn't find any members to send to!")
-                        return
+                gift_icon_index = last_stashed or self.present_stash.pop(random.randrange(len(self.present_stash)))
+                if not secret_members:
+                    self.bot.logger.error(f"I wanted to drop a gift, but I couldn't find any members to send to!")
+                    return
+                
+                # When the list has no available label (excluding current user)
+                if not member.id in self.label_stash:
                     # Create label list with the current user removed
-                    available_members = [i for i, s in enumerate (self.label_stash) if secret_members[s]['user_id'] != member.id]
+                    self.label_stash[member.id] = [i for i, s in enumerate (secret_members) if s['user_id'] != member.id]
+                
+                # Get the selected member object
+                secret_member_obj = secret_members[self.label_stash[member.id].pop(random.randrange(len(self.label_stash[member.id])))]
+                
+                # Repopulate gift list on empty
+                if len(self.label_stash[member.id]) == 0:
+                    self.label_stash[member.id] = [i for i, s in enumerate (secret_members) if not (s['user_id'] == secret_member_obj['user_id'] or s['user_id'] == member.id) ]
+            secret_member = secret_member_obj['nickname']
+            target_user_id = secret_member_obj['user_id']
 
-                    # When the list has no available label (excluding current user)
-                    if len(available_members) == 0:
-                        # Repopulate lists with latest user label removed
-                        self.label_stash = [i for i, s in enumerate (secret_members) if s['user_id'] != self.last_label]
-                        available_members = [i for i, s in enumerate (self.label_stash) if secret_members[s]['user_id'] != member.id]
-                    
-                    last_stashed = None
-
-                    # When both the label stash and available labels have 1(same) item left
-                    if len(self.label_stash) == 1 and len(available_members) == 1:
-                        # Store the last item
-                        last_stashed = self.label_stash[(available_members[0])] 
-                        # Repopulate label list removing the last item from list
-                        self.label_stash = [i for i, s in enumerate (secret_members) if s['user_id'] != secret_members[last_stashed]['user_id']]
-                    
-                    # Get the selected member object
-                    secret_member_obj = secret_members[last_stashed or self.label_stash.pop(random.choice(available_members))]
-                    
-                    # Set the last label sent
-                    self.last_label = secret_member_obj['user_id']
-
-                secret_member = secret_member_obj['nickname']
-                target_user_id = secret_member_obj['user_id']
-
-                async with conn.transaction():
+            async with conn.transaction():
+                await conn.fetch(
+                    """
+                    UPDATE user_data 
+                    SET last_gift = $2
+                    WHERE user_id = $1
+                    """,
+                    member.id,
+                    when
+                )
+                if first_attempt:
                     await conn.fetch(
                         """
-                        UPDATE user_data 
-                        SET last_gift = $2
-                        WHERE user_id = $1
+                        INSERT INTO gifts (user_id, target_user_id, gift_icon)
+                            VALUES ($1, $2, $3)
                         """,
                         member.id,
-                        when
+                        target_user_id,
+                        gift_icon_index
                     )
-                    if first_attempt:
-                        await conn.fetch(
-                            """
-                            INSERT INTO gifts (user_id, target_user_id, gift_icon)
-                                VALUES ($1, $2, $3)
-                            """,
-                            member.id,
-                            target_user_id,
-                            gift_icon_index
-                        )
-            await self.perform_natural_drop(member, secret_member, first_attempt, gift_icon_index)
+        await self.perform_natural_drop(member, secret_member, first_attempt, gift_icon_index)
 
     async def _add_score(self, user_id, when):
         await self.bot.db_available.wait()
