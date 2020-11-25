@@ -65,7 +65,7 @@ giftstrings = [ # Gift emoji will be prefixed to these strings.
   "{0} just sent 🥢 Chopsticks to {1}. {1} has no idea how to use them.",
   "{0} just sent a ♟ Pawn to {1}. Is this a challenge?",
   "{0} just sent an 🪓 Axe to {1}. {0} missed, thankfully.",
-  "{0} just sent a 🪙 Coin to {1}. Due to past experiences, you dread the coin.",
+  "{0} just sent a <:blobcoin:386670804865384458> BlobCoin to {1}. Due to past experiences, you dread the coin.",
   "{0} just sent a 🧩 Jigsaw Piece to {1}. The puzzle finally can be solved after all these years.",
   "{0} just sent a 🛹 Skateboard to {1}. It's a perfect time to be a cool kid.",
   "{0} just sent a 🔫 Water Gun to {1}. Who would give murder machines to an innocent person?!",
@@ -93,5 +93,6 @@ giftstrings = [ # Gift emoji will be prefixed to these strings.
   "{0} just sent a 🐺 Wolf to {1}. One down, thirteen to go.",
   "{0} just sent a 🪣 Bucket to {1}. There's more.",
   "{0} just sent a 🍙 Donut to {1}. I hope it's jelly-filled!",
-  "{0} just sent a <:bluedress:780590769924866049> Dress to {1}. Is it blue and black or white and gold?"
+  "{0} just sent a <:bluedress:780590769924866049> Dress to {1}. Is it blue and black or white and gold?",
+  "{0} just sent a <:rubberduck:780959941283938335> to {1}. It reminds you about blobs and… chairs? It smells like cheap plastic and nostalgia."
 ]

@@ -6,6 +6,7 @@ drop_channels = [
 ]
 
 present_log = 778410033926897685
+recovery_time = 10 # seconds in between messaage checks per user
 cooldown_time = 30  # seconds for cooldown
 drop_chance = 0.1  # chance for drop per message as float (0.1 is 10%, etc)
 
