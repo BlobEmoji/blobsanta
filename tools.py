@@ -33,7 +33,7 @@ def secret_substring(name: str) -> str:
 
 
 def secret_smudge(name: str) -> str:
-    smudged = random.sample(range(len(name)), round(len(name) * .7))
+    smudged = random.sample(range(len(name)), round(len(name) * .5))
     result = list(name)
     for i in smudged:
         result[i] = '#'
