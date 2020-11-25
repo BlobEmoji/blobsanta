@@ -138,7 +138,7 @@ class GiftDrop(commands.Cog):
                 secret_member_obj = secret_members[self.label_stash[member.id].pop(random.randrange(len(self.label_stash[member.id])))]
                 
                 # Repopulate gift list on empty
-                if len(self.label_stash[member.id]) == 0:
+                if len(self.label_stash[member.id]) == 0 or random.random() < 0.05:
                     self.label_stash[member.id] = [i for i, s in enumerate (secret_members) if not (s['user_id'] == secret_member_obj['user_id'] or s['user_id'] == member.id) ]
             secret_member = secret_member_obj['nickname']
             target_user_id = secret_member_obj['user_id']
