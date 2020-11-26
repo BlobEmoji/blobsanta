@@ -63,7 +63,7 @@ giftstrings = [ # Gift emoji will be prefixed to these strings.
   "{0} just sent a 💍 Ring to {1}. {0} and {1} are now engaged!",
   "{0} just sent a 🪵 Log to {1}. Does anyone even read this thing?",
   "{0} just sent 🥢 Chopsticks to {1}. {1} has no idea how to use them.",
-  "{0} just sent a ♟ Pawn to {1}. Is this a challenge?",
+  "{0} just sent a ♟️ Pawn to {1}. Is this a challenge?",
   "{0} just sent an 🪓 Axe to {1}. {0} missed, thankfully.",
   "{0} just sent a <:blobcoin:386670804865384458> BlobCoin to {1}. Due to past experiences, you dread the coin.",
   "{0} just sent a 🧩 Jigsaw Piece to {1}. The puzzle finally can be solved after all these years.",
@@ -94,5 +94,13 @@ giftstrings = [ # Gift emoji will be prefixed to these strings.
   "{0} just sent a 🪣 Bucket to {1}. There's more.",
   "{0} just sent a 🍙 Donut to {1}. I hope it's jelly-filled!",
   "{0} just sent a <:bluedress:780590769924866049> Dress to {1}. Is it blue and black or white and gold?",
-  "{0} just sent a <:rubberduck:780959941283938335> to {1}. It reminds you about blobs and… chairs? It smells like cheap plastic and nostalgia."
+  "{0} just sent a <:rubberduck:780959941283938335> to {1}. It reminds you about blobs and… chairs? It smells like cheap plastic and nostalgia.",
+  "{0} just sent a 🔀 Shuffle Button to {1}. There's no need for it, since everyday {1} is shuffling.",
+  "{0} just sent a 🧸 Teddy Bear to {1}. {1} wishes to have built it.",
+  "{0} just sent a 🚋 Train to {1}. {1} likes trains.",
+  "{0} just sent 🎵 Music to {1}. The RIAA reacts with a DMCA strike against Discord for allowing this crime.",
+  "{0} just sent a 🔦 Flashlight to {1}. Might as well force {1} to use Light Theme.",
+  "{0} just sent a ☎️ Telephone to {1}. Who you gonna call?",
+  "{0} just sent 8️⃣ Eight to {1}. Eight.",
+  "{0} just sent a 📼 VHS Cassette to {1}. {1} somehow had a VHS player, but the tape jammed on it."
 ]
