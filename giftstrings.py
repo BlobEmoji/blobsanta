@@ -105,5 +105,7 @@ giftstrings = [ # Gift emoji will be prefixed to these strings.
   "{0} just sent a 📼 VHS Cassette to {1}. {1} somehow had a VHS player, but the tape jammed on it.",
   "{0} just sent a 🐝 Bee to {1}. The bee reminds you of... Will Smith?",
   "{0} just sent a 👨 Man to {1}. It's a miserable pile of secrets.",
-  "{0} just sent a 🥏 Frisbee to {1}. Too bad, {0} has terrible aiming skills."
+  "{0} just sent a 🥏 Frisbee to {1}. Too bad, {0} has terrible aiming skills.",
+  "{0} just sent a 💾 Save Icon to {1}. A 3D-printed example of a skeuomorphic design.",
+  "{0} just sent a � Rocket Ship to {1}. Delivery crew sold separately."
 ]
