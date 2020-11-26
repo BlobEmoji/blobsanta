@@ -15,11 +15,11 @@ def test_username(nickname: str, ctx: commands.Context) -> list:
         verbal_test = "custom name"
 
     if len(string_to_test) < 4:
-        errors.append(f"Your {verbal_test} is too short, it need to be at least 4 characters")
+        errors.append(f"Your {verbal_test} is too short, it needs to be at least 4 characters")
     if len(string_to_test) > 16:
         errors.append(f"Your {verbal_test} is too long, it needs to be under 16 characters")
     if string_to_test.lower().startswith("confirm"):
-        errors.append(f"Your {verbal_test} is blacklisted")
+        errors.append(f"Your {verbal_test} is contains disallowed prefix 'confirm'")
     if not (string_to_test.isalpha() and string_to_test.isascii()):
         errors.append(f"Please only use alphabetical characters in your {verbal_test}")
     return errors
