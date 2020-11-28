@@ -22,6 +22,8 @@ def test_username(nickname: str, ctx: commands.Context) -> list:
         errors.append(f"Your {verbal_test} is contains disallowed prefix 'confirm'")
     if not (string_to_test.isalpha() and string_to_test.isascii()):
         errors.append(f"Please only use alphabetical characters in your {verbal_test}")
+    if len(set(string_to_test)) == 1:
+        errors.append(f"Please use more than one unique character in your {verbal_test}")
     return errors
 
 
