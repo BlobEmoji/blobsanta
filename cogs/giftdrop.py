@@ -328,8 +328,9 @@ class GiftDrop(commands.Cog):
                     async with conn.transaction():
                         await conn.execute(
                             """
-                            DELETE FROM gifts
-                            WHERE active = TRUE AND user_id = $1
+                            UPDATE gifts
+                            SET active = FALSE
+                            WHERE user_id = $1 AND active = TRUE
                             """, ctx.author.id)
 
                 await ctx.send(f"Deleted, the answer was **{nickname.lower()}**")
