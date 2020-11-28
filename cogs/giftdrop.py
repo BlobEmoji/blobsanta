@@ -500,26 +500,6 @@ class GiftDrop(commands.Cog):
         except (discord.Forbidden, discord.HTTPException):
             pass
 
-    # Testing purposes only
-    # DELETE LATER
-    @commands.check(utils.check_granted_server)
-    @commands.command("reset")
-    async def reset_command(self, ctx: commands.Context):
-        if not self.bot.db_available.is_set():
-            await ctx.send("No connection to database.")
-            return
-
-        async with self.bot.db.acquire() as conn:
-            check = await check_is_in(conn, ctx.author.id)
-            if check is False:
-                await ctx.send("This user doesn't have a database entry.")
-                return
-
-            async with conn.transaction():
-                await conn.execute("DELETE FROM user_data WHERE user_id = $1", ctx.author.id)
-
-            await ctx.send(f"Cleared entry for {ctx.author.id}")
-
     @commands.has_permissions(ban_members=True)
     @commands.check(utils.check_granted_server)
     @commands.command("extract_data")
