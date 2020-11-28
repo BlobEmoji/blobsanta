@@ -107,5 +107,10 @@ giftstrings = [ # Gift emoji will be prefixed to these strings.
   "{0} just sent a 👨 Man to {1}. It's a miserable pile of secrets.",
   "{0} just sent a 🥏 Frisbee to {1}. Too bad, {0} has terrible aiming skills.",
   "{0} just sent a 💾 Save Icon to {1}. A 3D-printed example of a skeuomorphic design.",
-  "{0} just sent a � Rocket Ship to {1}. Delivery crew sold separately."
+  "{0} just sent a 🚀 Rocket Ship to {1}. Delivery crew sold separately.",
+  "{0} just sent a 👢 Boot to {1}. They are made for walking, and that's just what they'll do.",
+  "{0} just sent a 🏭 Factory to {1}. They both knew about one thing: The factory must grow.",
+  "{0} just sent 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England to {1}. Despite the claims of someone, England is not a city.",
+  "{0} just sent the 🇺🇸 United States to {1}. This is America.",
+  "{0} just sent a 🎻 Violin to {1}. Nowadays, sad kids prefer listening to Despacito than to its sound."
 ]
