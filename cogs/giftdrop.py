@@ -55,7 +55,7 @@ class GiftDrop(commands.Cog):
                         f"User {message.author.id} guessed gift ({gift}) in {calculated_time} seconds."
                     )
                 else:
-                    await message.add_reaction('<:redtick:567088349484023818>')
+                    await message.add_reaction(self.bot.config.get('wrong_emoji'))
             return
 
         if message.channel.id not in self.bot.config.get("drop_channels", []): return

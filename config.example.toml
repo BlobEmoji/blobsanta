@@ -30,6 +30,8 @@ hints = [
 ]
 embed_url = 'https://cdn.discordapp.com/attachments/542422265254641674/778763462759022632/googlegiftmintavatarmini.png'
 
+wrong_emoji = '<:redtick:567088349484023818>'
+
 gift_emojis = [
   '<:googlegiftindigo:782336872503967754>',
   '<:googlegiftmagenta:782336872608956467>',
