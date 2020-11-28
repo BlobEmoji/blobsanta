@@ -41,10 +41,12 @@ def secret_smudge(name: str) -> str:
     return f"Find the missing letters: `{result}`"
 
 
-def secret_scramble(name: str) -> str:
+def secret_scramble(name: str, attempts=10) -> str:
     scrambled = list(name)
     random.shuffle(scrambled)
     result = ''.join(scrambled)
+    if result == name and attempts != 0:
+        return secret_scramble(name, attempts-1)
     return f"Unscramble: `{result}`"
 
 
