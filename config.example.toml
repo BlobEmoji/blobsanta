@@ -12,7 +12,9 @@ drop_chance = 0.1  # chance for drop per message as float (0.1 is 10%, etc)
 
 admin_users = [
   248245568004947969,
-  240973228632178689
+  240973228632178689,
+  123879073972748290,
+  69198249432449024
 ]
 
 # a list of guild IDs to pull static emotes from
