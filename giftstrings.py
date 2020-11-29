@@ -103,7 +103,7 @@ giftstrings = [ # Gift emoji will be prefixed to these strings.
   "{0} just sent a ☎️ Telephone to {1}. Who you gonna call?",
   "{0} just sent 8️⃣ Eight to {1}. Eight.",
   "{0} just sent a 📼 VHS Cassette to {1}. {1} somehow had a VHS player, but the tape jammed on it.",
-  "{0} just sent a 🐝 Bee to {1}. The bee reminds you of... Will Smith?",
+  "{0} just sent a <:googlebee:612122990338899995> Bee to {1}. The bee reminds you of... Will Smith?",
   "{0} just sent a 👨 Man to {1}. It's a miserable pile of secrets.",
   "{0} just sent a 🥏 Frisbee to {1}. Too bad, {0} has terrible aiming skills.",
   "{0} just sent a 💾 Save Icon to {1}. A 3D-printed example of a skeuomorphic design.",
