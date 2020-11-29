@@ -112,5 +112,9 @@ giftstrings = [ # Gift emoji will be prefixed to these strings.
   "{0} just sent a 🏭 Factory to {1}. They both knew about one thing: The factory must grow.",
   "{0} just sent 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England to {1}. Despite the claims of someone, England is not a city.",
   "{0} just sent the 🇺🇸 United States to {1}. This is America.",
-  "{0} just sent a 🎻 Violin to {1}. Nowadays, sad kids prefer listening to Despacito than to its sound."
+  "{0} just sent a 🎻 Violin to {1}. Nowadays, sad kids prefer listening to Despacito than to its sound.",
+  "{0} just sent 🌎 the Earth to {1}. You are not supposed to take over it, but what if you did anyway?",
+  "{0} just sent   to {1}. Wait, sent what? You can't send nothing! That's cruel!",
+  "{0} just sent a 🛏️ Bed to {1}. Looks like {1} really needs to sleep.",
+  "{0} just sent a 🧟 Zombie to {1}. Suddenly, reality became a B-movie where {0} causes a zombie apocalypse."
 ]
