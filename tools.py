@@ -15,13 +15,15 @@ def test_username(nickname: str, ctx: commands.Context) -> list:
         verbal_test = "custom name"
 
     if len(string_to_test) < 4:
-        errors.append(f"Your {verbal_test} is too short. It need to be at least 4 characters.")
+        errors.append(f"Your {verbal_test} is too short, it needs to be at least 4 characters")
     if len(string_to_test) > 16:
-        errors.append(f"Your {verbal_test} is too long. It needs to be under 16 characters.")
+        errors.append(f"Your {verbal_test} is too long, it needs to be under 16 characters")
     if string_to_test.lower().startswith("confirm"):
-        errors.append(f"Your {verbal_test} is blacklisted.")
+        errors.append(f"Your {verbal_test} is contains disallowed prefix 'confirm'")
     if not (string_to_test.isalpha() and string_to_test.isascii()):
-        errors.append(f"Please only use alphabetical characters in your {verbal_test}.")
+        errors.append(f"Please only use alphabetical characters in your {verbal_test}")
+    if len(set(string_to_test)) == 1:
+        errors.append(f"Please use more than one unique character in your {verbal_test}")
     return errors
 
 
@@ -33,7 +35,7 @@ def secret_substring(name: str) -> str:
 
 
 def secret_smudge(name: str) -> str:
-    smudged = random.sample(range(len(name)), round(len(name) * .7))
+    smudged = random.sample(range(len(name)), round(len(name) * .5))
     result = list(name)
     for i in smudged:
         result[i] = '#'
@@ -41,10 +43,12 @@ def secret_smudge(name: str) -> str:
     return f"Find the missing letters: `{result}`"
 
 
-def secret_scramble(name: str) -> str:
+def secret_scramble(name: str, attempts=10) -> str:
     scrambled = list(name)
     random.shuffle(scrambled)
     result = ''.join(scrambled)
+    if result == name and attempts != 0:
+        return secret_scramble(name, attempts-1)
     return f"Unscramble: `{result}`"
 
 

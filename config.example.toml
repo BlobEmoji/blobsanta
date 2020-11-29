@@ -12,7 +12,9 @@ drop_chance = 0.1  # chance for drop per message as float (0.1 is 10%, etc)
 
 admin_users = [
   248245568004947969,
-  240973228632178689
+  240973228632178689,
+  123879073972748290,
+  69198249432449024
 ]
 
 # a list of guild IDs to pull static emotes from
@@ -30,45 +32,50 @@ hints = [
 ]
 embed_url = 'https://cdn.discordapp.com/attachments/542422265254641674/778763462759022632/googlegiftmintavatarmini.png'
 
+wrong_emoji = '<:redtick:567088349484023818>'
+
 gift_emojis = [
-  '<:googlegiftyellow2:779906229119615017>',
-  '<:googlegiftyellow:779906229094711296>',
-  '<:googlegiftwhite:779906228956299264>',
-  '<:googlegiftred2:779906229052243978>',
-  '<:googlegiftred:779906229237579786>',
-  '<:googlegiftpurple:779906229082390539>',
-  '<:googlegiftpink2:779906229060763658>',
-  '<:googlegiftpink:779906228977401866>',
-  '<:googlegiftowo:779906229187117116>',
-  '<:googlegiftorange:779906228913831957>',
-  '<:googlegiftmint:779906228943978516>',
-  '<:googlegiftindigo:779906228964294666>',
-  '<:googlegiftgreen:779906228931133440>',
-  '<:googlegiftgray:779906228838334485>',
-  '<:googlegiftbrown:779906228830076959>',
-  '<:googlegiftblue:779906228507377735>',
-  '<:googlegiftblack:779906228238680095>'
+  '<:googlegiftindigo:782336872503967754>',
+  '<:googlegiftmagenta:782336872608956467>',
+  '<:googlegiftorange:782336872356642817>',
+  '<:googlegiftowo:782336872642904074>',
+  '<:googlegiftpink2:782336872743174204>',
+  '<:googlegiftyellow:782336872453373963>',
+  '<:googlegiftblack:782337349173903390>',
+  '<:googlegiftbrown:782337349224235028>',
+  '<:googlegiftyellow2:782337349257265222>',
+  '<:googlegiftwhite:782337349039423488>',
+  '<:googlegiftgray:782337349002461225>',
+  '<:googlegiftgreen:782337348896555080>',
+  '<:googlegiftmint:782337349333286953>',
+  '<:googlegiftpink:782337349169840148>',
+  '<:googlegiftpurple:782337349240881197>',
+  '<:googlegiftred:782337349349933086>',
+  '<:googlegiftred2:782337348893540363>',
+  '<:googlegiftblue:782336872558100490>'
 ]
 
 gift_icons = [
-  'https://cdn.discordapp.com/emojis/779865590189391893.png?v=1',
-  'https://cdn.discordapp.com/emojis/779865590096855092.png?v=1',
-  'https://cdn.discordapp.com/emojis/779865590357688371.png?v=1',
-  'https://cdn.discordapp.com/emojis/779865590516940811.png?v=1',
-  'https://cdn.discordapp.com/emojis/779865590260826174.png?v=1',
-  'https://cdn.discordapp.com/emojis/779865590566879252.png?v=1',
-  'https://cdn.discordapp.com/emojis/779865590810148915.png?v=1',
-  'https://cdn.discordapp.com/emojis/779865590483517482.png?v=1',
-  'https://cdn.discordapp.com/emojis/779865590495576104.png?v=1',
-  'https://cdn.discordapp.com/emojis/779865590549577748.png?v=1',
-  'https://cdn.discordapp.com/emojis/779865590504357948.png?v=1',
-  'https://cdn.discordapp.com/emojis/779865590517071902.png?v=1',
-  'https://cdn.discordapp.com/emojis/779865590310895647.png?v=1',
-  'https://cdn.discordapp.com/emojis/779865590584049674.png?v=1',
-  'https://cdn.discordapp.com/emojis/779865590516678656.png?v=1',
-  'https://cdn.discordapp.com/emojis/779865590487187496.png?v=1',
-  'https://cdn.discordapp.com/emojis/779865590504488970.png?v=1'
+  'https://cdn.discordapp.com/attachments/779865536921600003/782337825797832724/googlegiftindigo.png',
+  'https://cdn.discordapp.com/attachments/779865536921600003/782337829740216340/googlegiftmagenta.png',
+  'https://cdn.discordapp.com/attachments/779865536921600003/782337833750888478/googlegiftorange.png',
+  'https://cdn.discordapp.com/attachments/779865536921600003/782337838808956938/googlegiftowo.png',
+  'https://cdn.discordapp.com/attachments/779865536921600003/782337842310283324/googlegiftpink2.png',
+  'https://cdn.discordapp.com/attachments/779865536921600003/782337845654323240/googlegiftyellow.png',
+  'https://cdn.discordapp.com/attachments/779865536921600003/782337849109774336/googlegiftblack.png',
+  'https://cdn.discordapp.com/attachments/779865536921600003/782337852096774154/googlegiftbrown.png',
+  'https://cdn.discordapp.com/attachments/779865536921600003/782337858115600416/googlegiftyellow2.png',
+  'https://cdn.discordapp.com/attachments/779865536921600003/782337858627174461/googlegiftwhite.png',
+  'https://cdn.discordapp.com/attachments/779865536921600003/782337874992824380/googlegiftgray.png',
+  'https://cdn.discordapp.com/attachments/779865536921600003/782337887093522482/googlegiftgreen.png',
+  'https://cdn.discordapp.com/attachments/779865536921600003/782337891501867058/googlegiftmint.png',
+  'https://cdn.discordapp.com/attachments/779865536921600003/782337897072164884/googlegiftpink.png',
+  'https://cdn.discordapp.com/attachments/779865536921600003/782337901555744828/googlegiftpurple.png',
+  'https://cdn.discordapp.com/attachments/779865536921600003/782337905417912330/googlegiftred.png',
+  'https://cdn.discordapp.com/attachments/779865536921600003/782337909394767922/googlegiftred2.png',
+  'https://cdn.discordapp.com/attachments/779865536921600003/782337913848594472/googlegiftblue.png'
 ]
+
 
 [reward_roles]
 # Roles given to users once they reach a certain coin threshold
