@@ -645,6 +645,8 @@ class GiftDrop(commands.Cog):
             text = ' '.join(texts)
             diff = '\n'.join(strings)
 
+            if len(diff) > 1700: diff = '# Diff is too long sorry :('
+
             response = f"{text}\n```diff\n{diff}\n```"
 
         await ctx.send(f'Strings reloaded: {response}')
