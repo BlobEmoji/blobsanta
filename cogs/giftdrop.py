@@ -34,6 +34,7 @@ class GiftDrop(commands.Cog):
         self.log_stash = []
         self.users_last_message = {}
         self.users_last_channel = {}
+        self.users_drop_stash = {}
         self.last_label = None
         self.last_user = None
         self.giftstrings = []
@@ -45,10 +46,10 @@ class GiftDrop(commands.Cog):
     async def on_message(self, message: discord.Message):
 
         
-
+        
         # Do not drop gifts on commands
         if message.content.startswith(".") or message.content.lower().startswith("confirm"): return
-
+        
         immediate_time = datetime.utcnow()
         if message.author.id in self.current_gifters and not message.guild:
             async with self.bot.db.acquire() as conn:
@@ -69,24 +70,32 @@ class GiftDrop(commands.Cog):
         if message.channel.id not in self.bot.config.get("drop_channels", []): return
         self.users_last_channel[message.author.id] = {'name': message.channel.name, 'id': message.channel.id}
 
-        # Ignore messages that are more likely to be spammy
-        if len(message.content) < 5:
+        # Ignore messages that are more likely to be spammy and chain messages
+        if len(message.content) < 5 or self.last_user == message.author.id:
             return
-        drop_chance = self.bot.config.get("drop_chance", 0.1)
         
-        if self.last_user == message.author.id:
-            return
         self.last_user = message.author.id
-
-        if (not message.author.id in self.users_last_message or (datetime.now()-self.users_last_message[message.author.id]).total_seconds() > self.bot.config.get("recovery_time", 10)) and random.random() < drop_chance:
+        
+        if not message.author.id in self.users_last_message or (datetime.now()-self.users_last_message[message.author.id]).total_seconds() > self.bot.config.get("recovery_time", 10):
             self.users_last_message[message.author.id] = datetime.now()
             async with self.bot.db.acquire() as conn:
                 last_gift = await last_gift_from_db(conn, message.author.id)
                 if last_gift is not None:
-                    if (datetime.utcnow() - last_gift).total_seconds() > self.bot.config.get("cooldown_time", 30):
-                        self.bot.logger.info(f"A natural gift has dropped ({message.author.id})")
-                        self.bot.loop.create_task(self.create_gift(message.author, message.created_at))
+                    if (datetime.utcnow() - last_gift).total_seconds() > self.bot.config.get("cooldown_time", 30):     
+                        drop_chance = self.bot.config.get("drop_chance", 0.1)
 
+                        if not message.author.id in self.users_drop_stash or len(self.users_drop_stash[message.author.id]) == 0:
+                            self.users_drop_stash[message.author.id] = [True]*int(20*drop_chance) + [False]*int(20*(1-drop_chance))
+
+                        drop = self.users_drop_stash[message.author.id].pop(random.randrange(len(self.users_drop_stash[message.author.id])))
+                        
+                        if drop:
+                            self.users_drop_stash[message.author.id] = [True]*int(20*drop_chance) + [False]*int(20*(1-drop_chance))
+                            self.bot.logger.info(f"A natural gift has dropped ({message.author.id})")
+                            self.bot.loop.create_task(self.create_gift(message.author, message.created_at))
+
+
+            
 
     async def perform_natural_drop(self, user, secret_member, first_attempt, gift_icon_index):
         secret_string = secret_string_wrapper(secret_member)
