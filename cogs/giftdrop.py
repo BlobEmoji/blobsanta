@@ -69,7 +69,7 @@ class GiftDrop(commands.Cog):
         self.users_last_channel[message.author.id] = {'name': message.channel.name, 'id': message.channel.id}
 
         # Remove markdown
-        for pattern in ["***", "**", "*", "__", "~~", "||", "`", "```", ">"]:
+        for pattern in ["*", "__", "~~", "||", "`", ">"]:
             message.content = message.content.replace(pattern, "")
         # Ignore messages that are more likely to be spammy, chain messages and emoji-only messages.
         pattern = re.compile("<:.+?:\d+?>")
