@@ -118,5 +118,6 @@ giftstrings = [ # Gift emoji will be prefixed to these strings.
   "{0} just sent a 🛏️ Bed to {1}. Looks like {1} really needs to sleep.",
   "{0} just sent a 🧟 Zombie to {1}. Suddenly, reality became a B-movie where {0} causes a zombie apocalypse.",
   "{0} just sent a 🦃 Turkey to {1}. It's too late, now the turkey is useless until next year.",
-  "{0} just sent a 🐰 Rabbit to {1}. It lays chocolate eggs, thanks to the wonders of evolution."
+  "{0} just sent a 🐰 Rabbit to {1}. It lays chocolate eggs, thanks to the wonders of evolution.",
+  "{0} just sent 🧈 Butter to {1}. I can't believe it's not Blobs!"
 ]
