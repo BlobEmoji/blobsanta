@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
 import asyncio
+import collections
 import io
 import math
 import random
 from datetime import datetime, timedelta
 
 import discord
+import toml
 import numpy as np
 from asyncpg.exceptions import UniqueViolationError
 from discord.ext import commands
 
 from db_utils import fetch_gift_nickname, last_gift_from_db, check_has_gift, check_is_in
-from giftstrings import giftstrings
 from tools import test_username, secret_string_wrapper
 from . import utils
 
@@ -34,6 +35,10 @@ class GiftDrop(commands.Cog):
         self.users_last_message = {}
         self.users_last_channel = {}
         self.last_label = None
+        self.giftstrings = []
+
+        with open('giftstrings.toml', 'r', encoding='utf-8') as fp:
+            self.giftstrings = toml.load(fp)['giftstrings']
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
@@ -239,9 +244,9 @@ class GiftDrop(commands.Cog):
         rewards = self.bot.config.get('reward_roles', {})
 
         if len(self.log_stash) <= 1 or random.randint(0, 100) < 3:
-            self.log_stash = [*range(len(giftstrings))]
+            self.log_stash = [*range(len(self.giftstrings))]
 
-        log_message = f'{gift["gift_emoji"]} {giftstrings[self.log_stash.pop(random.randrange(len(self.log_stash)))]}'
+        log_message = f'{gift["gift_emoji"]} {self.giftstrings[self.log_stash.pop(random.randrange(len(self.log_stash)))]}'
         await log_channel.send(log_message.format(f"**{user['nickname']}**", f"**{target['nickname']}**"))
 
         # Check if the user reached the gifts sent/received thresholds
@@ -601,6 +606,48 @@ class GiftDrop(commands.Cog):
 
                 await ctx.send(f"Cleared entry for {target.id}")
 
+    @commands.has_permissions(ban_members=True)
+    @commands.check(utils.check_granted_server)
+    @commands.command("reload_strings")
+    async def reload_strings_command(self, ctx: commands.Context):
+        """Reload gift strings from file"""
+        old_strings = collections.Counter(self.giftstrings)
+
+        with open('giftstrings.toml', 'r', encoding='utf-8') as fp:
+            self.giftstrings = toml.load(fp)['giftstrings']
+
+        self.log_stash = [*range(len(self.giftstrings))]
+
+        new_strings = collections.Counter(self.giftstrings)
+
+        strings_removed = list(old_strings - new_strings)
+        strings_added = list(new_strings - old_strings)
+
+        if len(strings_removed) == 0 and len(strings_added) == 0:
+            response = 'No strings added or removed.'
+
+        else:
+            texts = []
+            strings = []
+
+            if strings_added:
+                texts.append(f'{len(strings_added)} string(s) added.')
+                
+                for string in strings_added:
+                    strings.append(f'+ "{string}"')
+
+            if strings_removed:
+                texts.append(f'{len(strings_removed)} string(s) removed.')
+
+                for string in strings_removed:
+                    strings.append(f'- "{string}"')
+
+            text = ' '.join(texts)
+            diff = '\n'.join(strings)
+
+            response = f"{text}\n```diff\n{diff}\n```"
+
+        await ctx.send(f'Strings reloaded: {response}')
 
 def setup(bot):
     bot.add_cog(GiftDrop(bot))
