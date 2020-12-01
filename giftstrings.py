@@ -65,7 +65,7 @@ giftstrings = [ # Gift emoji will be prefixed to these strings.
   "{0} just sent 🥢 Chopsticks to {1}. {1} has no idea how to use them.",
   "{0} just sent a ♟️ Pawn to {1}. Is this a challenge?",
   "{0} just sent an 🪓 Axe to {1}. {0} missed, thankfully.",
-  "{0} just sent a <:blobcoin:386670804865384458> BlobCoin to {1}. Due to past experiences, you dread the coin.",
+  "{0} just sent a <:blobcoin:783126697779920896> BlobCoin to {1}. Due to past experiences, you dread the coin.",
   "{0} just sent a 🧩 Jigsaw Piece to {1}. The puzzle finally can be solved after all these years.",
   "{0} just sent a 🛹 Skateboard to {1}. It's a perfect time to be a cool kid.",
   "{0} just sent a 🔫 Water Gun to {1}. Who would give murder machines to an innocent person?!",
