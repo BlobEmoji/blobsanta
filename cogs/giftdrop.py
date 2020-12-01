@@ -71,7 +71,7 @@ class GiftDrop(commands.Cog):
         self.users_last_channel[message.author.id] = {'name': message.channel.name, 'id': message.channel.id}
 
         # Ignore messages that are more likely to be spammy and chain messages
-        if len(message.content) < 5 or self.last_user == message.author.id:
+        if len(message.content) < 5 or self.last_user == message.author.id or (message.content.startswith("<") and message.content.endswith(">")):
             return
         
         self.last_user = message.author.id
@@ -88,7 +88,7 @@ class GiftDrop(commands.Cog):
                             self.users_drop_stash[message.author.id] = [True]*int(20*drop_chance) + [False]*int(20*(1-drop_chance))
 
                         drop = self.users_drop_stash[message.author.id].pop(random.randrange(len(self.users_drop_stash[message.author.id])))
-                        
+
                         if drop:
                             self.users_drop_stash[message.author.id] = [True]*int(20*drop_chance) + [False]*int(20*(1-drop_chance))
                             self.bot.logger.info(f"A natural gift has dropped ({message.author.id})")
