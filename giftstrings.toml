@@ -120,5 +120,15 @@ giftstrings = [ # Gift emoji will be prefixed to these strings.
   "{0} just sent a 🦃 Turkey to {1}. It's too late, now the turkey is useless until next year.",
   "{0} just sent a 🐰 Rabbit to {1}. It lays chocolate eggs, thanks to the wonders of evolution.",
   "{0} just sent 🧈 Butter to {1}. I can't believe it's not Blobs!",
-  "{0} just sent a 🖱️ Mouse to {1}. After <@!248245568004947969> aggressively left clicked the last one."
+  "{0} just sent a 🖱️ Mouse to {1}. However, Zeboto has destroyed it with his strong pointer finger.",
+  "{0} just sent a 📦 DLC to {1}. For some reason, it has been released the same day as its video game.",
+  "{0} just sent a 💣 Bomb to {1}. {1} gives it back to {0}. Some days, {0} can't just get rid of a bomb.",
+  "{0} just sent a 🎩 Top Hat to {1}. It contains a bunny inside, the only explanation is magic.",
+  "{0} just sent a 🦔 Hedgehog to {1}. {0} attempts to stop {1} from painting it blue.",
+  "{0} just sent a 🐑 Sheep to {1}. The world's most popular sleeping aid, now in real life.",
+  "{0} just sent a 🎺 Trumpet to {1}. Every day, a young boy attempts to play it, causing suffering to a poor girl.",
+  "{0} just sent a ☃️ Snowman to {1}. Do you wanna build a snowman?",
+  "{0} just sent a 📦 Package to {1}. Just one of these occupies 300 MBs on a computer.",
+  "{0} just sent an 🪓 Axe to {1}. {0} is Johnny!",
+  "{0} just sent 📚 Homework to {1}. {1} didn't deserve this at all!"
 ]
