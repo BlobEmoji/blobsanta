@@ -45,12 +45,9 @@ class GiftDrop(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
-
-        
-        
         # Do not drop gifts on commands
         if message.content.startswith(".") or message.content.lower().startswith("confirm"): return
-        
+
         immediate_time = datetime.utcnow()
         if message.author.id in self.current_gifters and not message.guild:
             async with self.bot.db.acquire() as conn:
@@ -71,19 +68,22 @@ class GiftDrop(commands.Cog):
         if message.channel.id not in self.bot.config.get("drop_channels", []): return
         self.users_last_channel[message.author.id] = {'name': message.channel.name, 'id': message.channel.id}
 
+        # Remove markdown
+        for pattern in ["*", "__", "~~", "||", "`", ">"]:
+            message.content = message.content.replace(pattern, "")
         # Ignore messages that are more likely to be spammy, chain messages and emoji-only messages.
         pattern = re.compile("<:.+?:\d+?>")
         if len(pattern.sub("", message.content)) < 5 or self.last_user == message.author.id:
             return
-        
+
         self.last_user = message.author.id
-        
+
         if not message.author.id in self.users_last_message or (datetime.now()-self.users_last_message[message.author.id]).total_seconds() > self.bot.config.get("recovery_time", 10):
             self.users_last_message[message.author.id] = datetime.now()
             async with self.bot.db.acquire() as conn:
                 last_gift = await last_gift_from_db(conn, message.author.id)
                 if last_gift is not None:
-                    if (datetime.utcnow() - last_gift).total_seconds() > self.bot.config.get("cooldown_time", 30):     
+                    if (datetime.utcnow() - last_gift).total_seconds() > self.bot.config.get("cooldown_time", 30):
                         drop_chance = self.bot.config.get("drop_chance", 0.1)
 
                         if not message.author.id in self.users_drop_stash or len(self.users_drop_stash[message.author.id]) == 0:
@@ -95,9 +95,6 @@ class GiftDrop(commands.Cog):
                             self.users_drop_stash[message.author.id] = [True]*int(20*drop_chance) + [False]*int(20*(1-drop_chance))
                             self.bot.logger.info(f"A natural gift has dropped ({message.author.id})")
                             self.bot.loop.create_task(self.create_gift(message.author, message.created_at))
-
-
-            
 
     async def perform_natural_drop(self, user, secret_member, first_attempt, gift_icon_index):
         secret_string = secret_string_wrapper(secret_member)
@@ -137,7 +134,7 @@ class GiftDrop(commands.Cog):
                 secret_member_obj = ret_value
             else:
                 secret_members = await conn.fetch("SELECT nickname, user_id FROM user_data ORDER BY creation_date ASC")
-                
+
                 last_stashed = None
                 if len(self.present_stash) == 1:
                     last_stashed = self.present_stash.pop()
@@ -150,15 +147,15 @@ class GiftDrop(commands.Cog):
                 if not secret_members:
                     self.bot.logger.error(f"I wanted to drop a gift, but I couldn't find any members to send to!")
                     return
-                
+
                 # When the list has no available label (excluding current user)
                 if not member.id in self.label_stash:
                     # Create label list with the current user removed
                     self.label_stash[member.id] = [i for i, s in enumerate (secret_members) if s['user_id'] != member.id]
-                
+
                 # Get the selected member object
                 secret_member_obj = secret_members[self.label_stash[member.id].pop(random.randrange(len(self.label_stash[member.id])))]
-                
+
                 # Repopulate gift list on empty
                 if len(self.label_stash[member.id]) == 0 or random.random() < 0.05:
                     self.label_stash[member.id] = [i for i, s in enumerate (secret_members) if not (s['user_id'] == secret_member_obj['user_id'] or s['user_id'] == member.id) ]
@@ -649,7 +646,7 @@ class GiftDrop(commands.Cog):
 
             if strings_added:
                 texts.append(f'{len(strings_added)} string(s) added.')
-                
+
                 for string in strings_added:
                     strings.append(f'+ "{string}"')
 
