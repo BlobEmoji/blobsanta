@@ -484,7 +484,7 @@ class GiftDrop(commands.Cog):
         async with self.bot.db.acquire() as conn:
             records = await conn.fetch("""
             SELECT nickname, gifts_sent, gifts_received FROM user_data
-            ORDER BY nickname ASC
+            ORDER BY lower(nickname)
             """)
 
             listing = []
