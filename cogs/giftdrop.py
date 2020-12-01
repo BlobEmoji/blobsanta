@@ -4,6 +4,7 @@ import collections
 import io
 import math
 import random
+import re
 from datetime import datetime, timedelta
 
 import discord
@@ -70,8 +71,9 @@ class GiftDrop(commands.Cog):
         if message.channel.id not in self.bot.config.get("drop_channels", []): return
         self.users_last_channel[message.author.id] = {'name': message.channel.name, 'id': message.channel.id}
 
-        # Ignore messages that are more likely to be spammy and chain messages
-        if len(message.content) < 5 or self.last_user == message.author.id or (message.content.startswith("<") and message.content.endswith(">")):
+        # Ignore messages that are more likely to be spammy, chain messages and emoji-only messages.
+        pattern = re.compile("<:.+?:\d+?>")
+        if len(pattern.sub("", message.content)) < 5 or self.last_user == message.author.id:
             return
         
         self.last_user = message.author.id
