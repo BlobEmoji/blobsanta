@@ -35,6 +35,7 @@ class GiftDrop(commands.Cog):
         self.users_last_message = {}
         self.users_last_channel = {}
         self.last_label = None
+        self.last_user = None
         self.giftstrings = []
 
         with open('giftstrings.toml', 'r', encoding='utf-8') as fp:
@@ -42,6 +43,8 @@ class GiftDrop(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
+
+        
 
         # Do not drop gifts on commands
         if message.content.startswith(".") or message.content.lower().startswith("confirm"): return
@@ -71,7 +74,10 @@ class GiftDrop(commands.Cog):
             return
         drop_chance = self.bot.config.get("drop_chance", 0.1)
         
-        
+        if self.last_user == message.author.id:
+            return
+        self.last_user = message.author.id
+
         if (not message.author.id in self.users_last_message or (datetime.now()-self.users_last_message[message.author.id]).total_seconds() > self.bot.config.get("recovery_time", 10)) and random.random() < drop_chance:
             self.users_last_message[message.author.id] = datetime.now()
             async with self.bot.db.acquire() as conn:
