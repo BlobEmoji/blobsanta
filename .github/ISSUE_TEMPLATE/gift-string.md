@@ -14,5 +14,5 @@ labels: 'string'
 <!-- Replace [ ] below with [x] to tick this checkbox. -->
 - [ ] All of my suggestions meet these guidelines.
 
-# String suggestions
+# String Suggestions
 <!-- Type your string suggestion(s), following the above guidelines below. Please include intended meaning/explanation for any references. -->
