@@ -15,4 +15,10 @@ labels: 'string'
 - [ ] All of my suggestions meet these guidelines.
 
 # String Suggestions
-<!-- Type your string suggestion(s), following the above guidelines below. Please include intended meaning/explanation for any references. -->
+*Type your string suggestion(s), following the above guidelines, below the line. Please include intended meaning/explanation for any references.*
+
+*(If you are intrested in creating a pull request to implement these suggestions yourself, please read our [Guidelines for Implementating Gift String Suggestions](https://github.com/BlobEmoji/blobsanta/blob/main/CONTRIBUTING.md#guidelines-for-implementating-gift-string-suggestions) after creating your issue.)*
+
+------
+
+- `{0} just sent...` 
