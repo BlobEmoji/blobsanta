@@ -548,7 +548,7 @@ class GiftDrop(commands.Cog):
                         for ind in inds:
                             if ind == i:
                                 count += 1
-                        row[i+2] = count
+                        row[i+2] = count if count != 0 else ""
 
                     data.append(row)
             elif mode == 'received':
@@ -563,7 +563,7 @@ class GiftDrop(commands.Cog):
                         for ind in inds:
                             if ind == i:
                                 count += 1
-                        row[i+2] = count
+                        row[i+2] = count if count != 0 else ""
 
                     data.append(row)
             elif mode == 'presents':
@@ -578,7 +578,7 @@ class GiftDrop(commands.Cog):
                         for ind in inds:
                             if ind == i:
                                 count += 1
-                        row[i+2] = count
+                        row[i+2] = count if count != 0 else ""
 
                     data.append(row)
             text = "\n".join(','.join([str(s) for s in x]) for x in data)
