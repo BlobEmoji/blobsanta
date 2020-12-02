@@ -3,9 +3,8 @@ name: Gift String Suggestion
 about: Suggest a gift string log message 
 title: 'Gift String Suggestion'
 labels: 'string'
-assignees: '@BlobEmoji/santa-strings-curators'
-
 ---
+@BlobEmoji/santa-strings-curators
 
 # String Guidelines
 - Strings should be in the general format of `{0} just sent (a/an) <Emoji> <Name> to {1}. <Flavor Text>`.
