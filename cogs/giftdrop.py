@@ -523,12 +523,13 @@ class GiftDrop(commands.Cog):
     @commands.has_permissions(ban_members=True)
     @commands.check(utils.check_granted_server)
     @commands.command("extract_data")
-    async def extract_data_command(self, ctx: commands.Context, mode: str='', n_bins: int=100):
+    async def extract_data_command(self, ctx: commands.Context, mode: str='', n_bins: int=600, all: bool=False):
         """Timeseries csv file for data visualization"""
         if not self.bot.db_available.is_set():
             await ctx.send("No connection to database.")
             return
-
+        await ctx.send("Extracting data...")
+        start_time = datetime.utcnow()
         async with self.bot.db.acquire() as conn:
             record = await conn.fetchrow("SELECT MIN(activated_date) as min_date, MAX(activated_date) as max_date FROM gifts")
             seconds = math.ceil((record['max_date']-record['min_date']).total_seconds()/(n_bins-1))
@@ -536,7 +537,7 @@ class GiftDrop(commands.Cog):
             features = ['name', 'pic'] + [x.strftime('%m/%d %H:%M') for x in bins]
             data = [features]
             if mode in ['', 'sent']:
-                users = await conn.fetch("SELECT user_id,nickname FROM user_data")
+                users = await conn.fetch("SELECT user_id,nickname FROM user_data WHERE gifts_sent >= $1 ORDER BY gifts_sent DESC", 0 if all else 1)
                 for user in users:
                     dates = np.array([np.datetime64(date['activated_date']) for date in await conn.fetch("SELECT activated_date FROM gifts WHERE user_id = $1 AND is_sent = TRUE", user['user_id'])]).view('i8')
 
@@ -581,7 +582,8 @@ class GiftDrop(commands.Cog):
 
                     data.append(row)
             text = "\n".join(','.join([str(s) for s in x]) for x in data)
-            await ctx.send(file=discord.File(filename="stats.csv", fp=io.BytesIO(text.encode("utf8"))))
+
+            await ctx.send(f"Finished! Took {(datetime.utcnow()-start_time).total_seconds()} seconds.", file=discord.File(filename="stats.csv", fp=io.BytesIO(text.encode("utf8"))))
 
     @commands.has_permissions(ban_members=True)
     @commands.check(utils.check_granted_server)
