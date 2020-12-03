@@ -370,7 +370,7 @@ class GiftDrop(commands.Cog):
         results = test_username(nickname, ctx)
         if len(results) > 0:
             joined = ';\n'.join(results)
-            await ctx.send(f"{ctx.author.mention}, {joined}.")
+            await ctx.send(f"{ctx.author.mention}, {joined}.\nFeel free to use a custom name with `.join <NickName>`")
             return
         async with self.bot.db.acquire() as conn:
 
