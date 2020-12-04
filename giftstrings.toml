@@ -130,5 +130,8 @@ giftstrings = [ # Gift emoji will be prefixed to these strings.
   "{0} just sent a ☃️ Snowman to {1}. Do you wanna build a snowman?",
   "{0} just sent a 📦 Package to {1}. Just one of these occupies 300 MBs on a computer.",
   "{0} just sent an 🪓 Axe to {1}. {0} is Johnny!",
-  "{0} just sent 📚 Homework to {1}. {1} didn't deserve this at all!"
+  "{0} just sent 📚 Homework to {1}. {1} didn't deserve this at all!",
+  "{0} just sent a 🐢 Turtle to {1}. This may take a while.",
+  "{0} just sent a 🛸 UFO to {1}. Look out!",
+  "{0} just sent 🪐 Saturn to {1}. It shouldn't be allowed, but yet, it is."
 ]
