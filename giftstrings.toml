@@ -1,6 +1,6 @@
 giftstrings = [ # Gift emoji will be prefixed to these strings.
   "{0} just sent a 🏈 Football to {1}. John Madden is proud of you.",
-  "{0} just sent a 📹️ GIF to {1}. Its expiration date was supposed to be years ago.",
+  "{0} just sent a 📹 GIF to {1}. Its expiration date was supposed to be years ago.",
   "{0} just sent a 🪆 Matryoshka doll to {1}. There's a lot of dolls in one single package!",
   "{0} just sent a 🎮 Video Game to {1}. Unfortunately, a sequel has been released right now.",
   "{0} just sent a 🛷 Sled to {1}. It's completely useless without snow!",
@@ -83,7 +83,7 @@ giftstrings = [ # Gift emoji will be prefixed to these strings.
   "{0} just sent a 🔮 Crystal Ball to {1}. The future has been revealed to {1}.",
   "{0} just sent a 👾 Space Invader to {1}. {1} is doomed, DOOMED!",
   "{0} just sent a ♟️️ Pawn to {1}. Checkmate!",
-  "{0} just sent a 🥧️ Pie to {1}. I wonder if it can tell the time...",
+  "{0} just sent a 🥧 Pie to {1}. I wonder if it can tell the time...",
   "{0} just sent a 🐉 Dragon to {1}. King Dragon sends his regards.",
   "{0} just sent a 🪕 Banjo to {1}. Hey, where's Kazooie?",
   "{0} just sent a 🥏 Frisbee to {1}. TWO POINTS!",
@@ -135,8 +135,9 @@ giftstrings = [ # Gift emoji will be prefixed to these strings.
   "{0} just sent a 🛸 UFO to {1}. Look out!",
   "{0} just sent 🪐 Saturn to {1}. It shouldn't be allowed, but yet, it is.",
   "{0} just sent a 👶 Baby to {1}. You hope that the baby will just be a baby and never be a gun.",
-  "{0} just sent 🚔 the Police to {1}. {1} has been arrested by them due to breaking numerous laws.",
+  "{0} just sent the 🚔 Police to {1}. {1} has been arrested by them due to breaking numerous laws.",
   "{0} just sent a 🍍 Pineapple to {1}. {1} puts it on their pizza.",
   "{0} just sent 🍟 Fries to {1}. The best American food- what do you mean it's French?",
-  "{0} just sent a 🧱 Brick to {1}. It's the same as LEGOs but it refuses to connect to each other."
+  "{0} just sent a 🧱 Brick to {1}. It's the same as LEGOs but it refuses to connect to each other.",
+  "{0} just sent an ➡️ Arrow to {1}. {1} used to be a blobber like {0}, then {1} took an arrow in the knee."
 ]
