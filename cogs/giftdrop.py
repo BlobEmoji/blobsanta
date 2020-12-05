@@ -261,7 +261,7 @@ class GiftDrop(commands.Cog):
             self.log_stash = [*range(len(self.giftstrings))]
 
         log_message = f'{gift["gift_emoji"]} {self.giftstrings[self.log_stash.pop(random.randrange(len(self.log_stash)))]}'
-        await log_channel.send(log_message.format(f"**{user['nickname']}**", f"**{target['nickname']}**"))
+        await log_channel.send(log_message.format(f"**{user['nickname']}**", f"**{target['nickname']}**", gift["gift_emoji"]))
 
         # Check if the user reached the gifts sent/received thresholds
         guild_member = guild.get_member(member.id) or await guild.fetch_member(member.id)
