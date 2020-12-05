@@ -139,5 +139,6 @@ giftstrings = [ # Gift emoji will be prefixed to these strings.
   "{0} just sent a 🍍 Pineapple to {1}. {1} puts it on their pizza.",
   "{0} just sent 🍟 Fries to {1}. The best American food- what do you mean it's French?",
   "{0} just sent a 🧱 Brick to {1}. It's the same as LEGOs but it refuses to connect to each other.",
-  "{0} just sent an ➡️ Arrow to {1}. {1} used to be a blobber like {0}, then {1} took an arrow in the knee."
+  "{0} just sent an ➡️ Arrow to {1}. {1} used to be a blobber like {0}, then {1} took an arrow in the knee.",
+  "{0} just sent a 👔 Tie to {1}. It's so hard to tie it, you wonder if the tie men could help you."
 ]
