@@ -68,11 +68,13 @@ class GiftDrop(commands.Cog):
         if message.channel.id not in self.bot.config.get("drop_channels", []): return
         self.users_last_channel[message.author.id] = {'name': message.channel.name, 'id': message.channel.id}
 
+        # Remove custom emojis with regex
+        message.content = re.sub(r"<a?:\w{2,32}:\d{15,21}>", "", message.content)
         # Remove markdown
         for pattern in ["*", "__", "~~", "||", "`", ">"]:
             message.content = message.content.replace(pattern, "")
         # Ignore messages that are more likely to be spammy, chain messages and emoji-only messages.
-        if len(re.sub(r"<a?:\w{2,32}:\d{15,21}>", "", message.content)) < 5 or self.last_user == message.author.id:
+        if len(message.content) < 5 or self.last_user == message.author.id:
             return
 
         self.last_user = message.author.id
