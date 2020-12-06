@@ -72,8 +72,7 @@ class GiftDrop(commands.Cog):
         for pattern in ["*", "__", "~~", "||", "`", ">"]:
             message.content = message.content.replace(pattern, "")
         # Ignore messages that are more likely to be spammy, chain messages and emoji-only messages.
-        pattern = re.compile("<a?:\w+?:\d+?>")
-        if len(pattern.sub("", message.content)) < 5 or self.last_user == message.author.id:
+        if len(re.sub(r"<a?:\w{2,32}:\d{15,21}>", "", message.content)) < 5 or self.last_user == message.author.id:
             return
 
         self.last_user = message.author.id
