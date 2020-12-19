@@ -145,5 +145,6 @@ giftstrings = [ # Gift emoji will be prefixed to these strings.
   "{0} just sent 🌞 the Sun to {1}. It used to be a deadly lazer, but not anymore, there's a blanket!",
   "{0} just sent a 🚪 Door to {1}. Knock knock, open up the door, it's real.",
   "{0} just sent a 📎 Paper Clip to {1}. Together with a chewing gum, it can solve anything.",
-  "{0} just sent a 💻 Computer to {1}. It can do anything you can."
+  "{0} just sent a 💻 Computer to {1}. It can do anything you can.",
+  "{0} just sent 📎 Clippy to {1}. It looks like you're receiving a gift. Would you like help?"
 ]
