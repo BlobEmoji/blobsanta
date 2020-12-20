@@ -1,4 +1,5 @@
 import random
+import re
 
 from typing import List
 from discord.ext import commands
@@ -52,10 +53,14 @@ def secret_scramble(name: str, attempts=10) -> str:
         return secret_scramble(name, attempts-1)
     return f"Unscramble: `{result}`"
 
-
 def secret_string_wrapper(secret_member: str, bad_phrases: List[str] ) -> str:
     secret_array = [secret_scramble, secret_substring, secret_smudge]
     secret_string = random.choice(secret_array)(secret_member)
-    if any(phrase in secret_string for phrase in bad_phrases): # bad words
+
+    # Check for bad words
+    secret_string_norm = secret_string.lower() # lowercase
+    secret_string_norm = re.sub('[^a-z1-9]', '', secret_string_norm) # remove smudging
+    if any(phrase in secret_string_norm for phrase in bad_phrases): # bad words
         secret_string = secret_string_wrapper(secret_member, bad_phrases) # try again
+
     return secret_string
