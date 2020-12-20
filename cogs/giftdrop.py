@@ -98,7 +98,7 @@ class GiftDrop(commands.Cog):
                             self.bot.loop.create_task(self.create_gift(message.author, message.created_at))
 
     async def perform_natural_drop(self, user, secret_member, first_attempt, gift_icon_index):
-        secret_string = secret_string_wrapper(secret_member)
+        secret_string = secret_string_wrapper(secret_member, self.bot.config.bad_words)
 
         if first_attempt: description = 'Type the name of the finished label to send the gift!'
         else: description = 'You have another chance. Type the name of \nthe finished label to send the gift!'
