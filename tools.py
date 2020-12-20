@@ -59,7 +59,7 @@ def secret_string_wrapper(secret_member: str, bad_phrases: List[str] ) -> str:
 
     # Check for bad words
     secret_string_norm = secret_string.lower() # lowercase
-    secret_string_norm = re.sub('[^a-z1-9]', '', secret_string_norm) # remove smudging
+    secret_string_norm = re.sub('#', '', secret_string_norm) # remove smudging
     if any(phrase in secret_string_norm for phrase in bad_phrases): # bad words
         secret_string = secret_string_wrapper(secret_member, bad_phrases) # try again
 
