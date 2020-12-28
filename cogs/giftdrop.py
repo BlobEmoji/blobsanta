@@ -77,8 +77,12 @@ class GiftDrop(commands.Cog):
         if len(message.content) < 5 or self.last_user == message.author.id:
             return
 
+        # Ignore messages when out of gifts
+        if self.bot.config.get('post_event') and self.bot.config.get('gifts_left') < 0:
+            return
+        
         self.last_user = message.author.id
-
+        
         if not message.author.id in self.users_last_message or (datetime.now()-self.users_last_message[message.author.id]).total_seconds() > self.bot.config.get("recovery_time", 10):
             self.users_last_message[message.author.id] = datetime.now()
             async with self.bot.db.acquire() as conn:
@@ -260,9 +264,13 @@ class GiftDrop(commands.Cog):
 
         if len(self.log_stash) <= 1 or random.randint(0, 100) < 3:
             self.log_stash = [*range(len(self.giftstrings))]
-
-        log_message = f'{gift["gift_emoji"]} {self.giftstrings[self.log_stash.pop(random.randrange(len(self.log_stash)))]}'
-        await log_channel.send(log_message.format(f"**{user['nickname']}**", f"**{target['nickname']}**", gift["gift_emoji"]))
+            
+        async with self.gift_lock:
+            log_message = f'{gift["gift_emoji"]} {self.giftstrings[self.log_stash.pop(random.randrange(len(self.log_stash)))]}'
+            if self.bot.config.get('post_event'):
+                log_message += f" ({self.bot.config.get('gifts_left')} gifts left)"
+                self.bot.config['gifts_left'] -= 1
+            await log_channel.send(log_message.format(f"**{user['nickname']}**", f"**{target['nickname']}**", gift["gift_emoji"]))
 
         # Check if the user reached the gifts sent/received thresholds
         guild_member = guild.get_member(member.id) or await guild.fetch_member(member.id)
